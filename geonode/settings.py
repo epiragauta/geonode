@@ -102,12 +102,12 @@ if not SITEURL.endswith('/'):
     SITEURL = '{}/'.format(SITEURL)
 
 # spatialite or sqlite
-#DATABASE_URL = os.getenv(
-#    'DATABASE_URL',
-#    'spatialite:///{path}'.format(
-#        path=os.path.join(PROJECT_ROOT, 'development.db')
-#    )
-#)
+DATABASE_URL = os.getenv(
+    'DATABASE_URL',
+    'spatialite:///{path}'.format(
+        path=os.path.join(PROJECT_ROOT, 'development.db')
+    )
+)
 # DATABASE_URL = 'postgresql://geonode:geonode_data@dev.skaphe.com:5432/geonode'
 
 if DATABASE_URL.startswith("spatialite"):
@@ -130,7 +130,7 @@ if DATABASE_URL.startswith("spatialite"):
 # detailed list of supported backends and notes.
 _db_conf = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
 
-_db_conf['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+# _db_conf['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 if 'CONN_TOUT' in _db_conf:
     _db_conf['CONN_TOUT'] = 5
 if 'postgresql' in DATABASE_URL or 'postgis' in DATABASE_URL:
@@ -141,7 +141,7 @@ if 'postgresql' in DATABASE_URL or 'postgis' in DATABASE_URL:
     })
 
 DATABASES = {
-    'default': _db_conf,    
+    'default': _db_conf,
 }
 
 if os.getenv('DEFAULT_BACKEND_DATASTORE'):
@@ -453,11 +453,17 @@ GEONODE_CONTRIB_APPS = (
 
 # Uncomment the following line to enable contrib apps
 GEONODE_APPS = GEONODE_CORE_APPS + GEONODE_INTERNAL_APPS + GEONODE_CONTRIB_APPS
-
+CMS_APPS = (
+    'cms',
+    'menus',
+    'sekizai',
+    'filer',
+    'easy_thumbnails')
+    
 INSTALLED_APPS = (
 
     # Boostrap admin theme
-    # 'django_admin_bootstrapped.bootstrap3',
+    #'django_admin_bootstrapped.bootstrap3',
     # 'django_admin_bootstrapped',
 
     # Apps bundled with Django
@@ -469,6 +475,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
@@ -476,7 +483,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.gis',
     'django.contrib.admindocs',
-
+    
     # Utility
     'dj_pagination',
     'taggit',
@@ -527,6 +534,7 @@ markdown_white_listed_tags = {
 MARKDOWNIFY_WHITELIST_TAGS = os.getenv('MARKDOWNIFY_WHITELIST_TAGS', markdown_white_listed_tags)
 
 INSTALLED_APPS += GEONODE_APPS
+INSTALLED_APPS += CMS_APPS
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -667,7 +675,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.contrib.auth.context_processors.auth',
+                'sekizai.context_processors.sekizai',
+                'cms.context_processors.cms_settings',
                 # 'django.core.context_processors.debug',
                 # 'django.core.context_processors.i18n',
                 # 'django.core.context_processors.tz',
@@ -705,6 +714,11 @@ MIDDLEWARE = (
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'geonode.base.middleware.MaintenanceMiddleware',
     'geonode.base.middleware.ReadOnlyMiddleware',   # a Middleware enabling Read Only mode of Geonode
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware',
+    'cms.middleware.utils.ApphookReloadMiddleware',
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
@@ -722,7 +736,7 @@ SESSION_COOKIE_SECURE = ast.literal_eval(os.environ.get('SESSION_COOKIE_SECURE',
 CSRF_COOKIE_SECURE = ast.literal_eval(os.environ.get('CSRF_COOKIE_SECURE', 'False'))
 CSRF_COOKIE_HTTPONLY = ast.literal_eval(os.environ.get('CSRF_COOKIE_HTTPONLY', 'False'))
 CORS_ORIGIN_ALLOW_ALL = ast.literal_eval(os.environ.get('CORS_ORIGIN_ALLOW_ALL', 'False'))
-X_FRAME_OPTIONS = os.environ.get('X_FRAME_OPTIONS', 'DENY')
+X_FRAME_OPTIONS = os.environ.get('X_FRAME_OPTIONS', 'SAMEORIGIN')
 SECURE_CONTENT_TYPE_NOSNIFF = ast.literal_eval(os.environ.get('SECURE_CONTENT_TYPE_NOSNIFF', 'True'))
 SECURE_BROWSER_XSS_FILTER = ast.literal_eval(os.environ.get('SECURE_BROWSER_XSS_FILTER', 'True'))
 SECURE_SSL_REDIRECT = ast.literal_eval(os.environ.get('SECURE_SSL_REDIRECT', 'False'))
@@ -2065,3 +2079,7 @@ FREQUENTLY_ALLOW_ANONYMOUS = True
 STUDY_CASES_ALLOW_ANONYMOUS = True
 
 WATERPROOF_NBS_CA_ALLOW_ANONYMOUS = True
+
+CMS_TEMPLATES = [
+    ('home.html', 'Home page template'),
+]

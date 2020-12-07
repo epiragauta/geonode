@@ -274,6 +274,10 @@ urlpatterns += [
     url(r'^faq/', include('geonode.frequently.urls'), name='faq'),
 ]
 
+#cms
+urlpatterns += [url(r'^cms/', include('cms.urls')),
+]
+
 # Study Cases
 urlpatterns += [
     url(r'^study_cases/', include('geonode.study_cases.urls'), name='study_cases'),
