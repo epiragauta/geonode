@@ -152,8 +152,7 @@ DATABASES = {
 
 if os.getenv('DEFAULT_BACKEND_DATASTORE'):
     GEODATABASE_URL = os.getenv('GEODATABASE_URL',
-                                'postgis://\
-geonode:geonode_data@dev.skaphe.com:5432/geonode')
+                                'postgis://geonode:geonode@localhost:5432/geonode')
     DATABASES[os.getenv('DEFAULT_BACKEND_DATASTORE')] = dj_database_url.parse(
         GEODATABASE_URL, conn_max_age=GEONODE_DB_CONN_MAX_AGE
     )
@@ -479,6 +478,13 @@ GEONODE_CONTRIB_APPS = (
 # Uncomment the following line to enable contrib apps
 GEONODE_APPS = GEONODE_CORE_APPS + GEONODE_INTERNAL_APPS + GEONODE_CONTRIB_APPS
 
+CMS_APPS = (
+    'cms',
+    'menus',
+    'sekizai',
+    'filer',
+    'easy_thumbnails')
+
 INSTALLED_APPS = (
 
     # Boostrap admin theme
@@ -501,6 +507,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.gis',
     'django.contrib.admindocs',
+    'djangocms_admin_style',
 
     # Utility
     'dj_pagination',
@@ -564,6 +571,7 @@ markdown_white_listed_tags = {
 MARKDOWNIFY_WHITELIST_TAGS = os.getenv('MARKDOWNIFY_WHITELIST_TAGS', markdown_white_listed_tags)
 
 INSTALLED_APPS += GEONODE_APPS
+INSTALLED_APPS += CMS_APPS
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -763,7 +771,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'geonode.context_processors.resource_urls',
                 'geonode.geoserver.context_processors.geoserver_urls',
-                'geonode.themes.context_processors.custom_theme'
+                'geonode.themes.context_processors.custom_theme',
+                'sekizai.context_processors.sekizai',
+                'cms.context_processors.cms_settings',
             ],
             # Either remove APP_DIRS or remove the 'loaders' option.
             # 'loaders': [
@@ -792,6 +802,11 @@ MIDDLEWARE = (
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'geonode.base.middleware.MaintenanceMiddleware',
     'geonode.base.middleware.ReadOnlyMiddleware',   # a Middleware enabling Read Only mode of Geonode
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware',
+    'cms.middleware.utils.ApphookReloadMiddleware',
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
@@ -2187,6 +2202,9 @@ GRAY_BASEMAP_URL = "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y
 GEOSERVER_WMS = 'http://apps.skaphe.com:8080/geoserver/waterproof/wms?'
 HYDRO_NETWORK_LYR = 'waterproof:world_hydro_network'
 
+CMS_TEMPLATES = [
+    ('home.html', 'Home page template'),
+]
 
 # WATERPROOF_API_METHODS = {
 #

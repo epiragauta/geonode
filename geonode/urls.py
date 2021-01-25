@@ -19,7 +19,7 @@
 #########################################################################
 
 import django
-from django.conf.urls import include, url
+from django.conf.urls import include, url, re_path
 from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
@@ -196,6 +196,11 @@ urlpatterns += [
 
     # tinymce WYSIWYG HTML Editor
     url(r'^tinymce/', include('tinymce.urls')),
+]
+
+#cms
+urlpatterns += [
+    re_path(r'^cms/', include('cms.urls')),
 ]
 
 urlpatterns += i18n_patterns(
