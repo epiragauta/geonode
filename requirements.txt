@@ -147,6 +147,6 @@ splinter==0.14.0
 pytest-splinter==3.2.0
 pytest-django==3.10.0
 setuptools==50.3.0
-pip==20.2.3
+pip==21.0
 Twisted==20.3.0
 factory-boy==3.0.1
