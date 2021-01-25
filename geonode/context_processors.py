@@ -181,7 +181,21 @@ def resource_urls(request):
         ),
         OGC_SERVER=getattr(settings, 'OGC_SERVER', None),
         DELAYED_SECURITY_SIGNALS=getattr(settings, 'DELAYED_SECURITY_SIGNALS', False),
-        READ_ONLY_MODE=getattr(Configuration.load(), 'read_only', False)
+        READ_ONLY_MODE=getattr(Configuration.load(), 'read_only', False),
+        # GeoNode Apps
+        GEONODE_APPS_ENABLE=getattr(settings, 'GEONODE_APPS_ENABLE', False),
+        GEONODE_APPS_NAME=getattr(settings, 'GEONODE_APPS_NAME', 'Apps'),
+        GEONODE_APPS_NAV_MENU_ENABLE=getattr(settings, 'GEONODE_APPS_NAV_MENU_ENABLE', False),
+        # Waterproof
+        SEARCH_CITY_API_URL= settings.SEARCH_CITY_API_URL,
+        SEARCH_COUNTRY_API_URL = settings.SEARCH_COUNTRY_API_URL,
+        OSM_BASEMAP_URL = settings.OSM_BASEMAP_URL,
+        IMG_BASEMAP_URL = settings.IMG_BASEMAP_URL,
+        GRAY_BASEMAP_URL = settings.GRAY_BASEMAP_URL,
+        HYDRO_BASEMAP_URL = settings.HYDRO_BASEMAP_URL,
+        GEOSERVER_WMS = settings.GEOSERVER_WMS,
+        HYDRO_NETWORK_LYR = settings.HYDRO_NETWORK_LYR,
+
     )
 
     return defaults

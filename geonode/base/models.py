@@ -45,6 +45,10 @@ from django.core.files.storage import default_storage as storage
 
 from mptt.models import MPTTModel, TreeForeignKey
 
+from PIL import Image
+from io import BytesIO
+from resizeimage import resizeimage
+
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
@@ -847,6 +851,12 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
         null=True,
         blank=True)
 
+    resource_type = models.CharField(
+        _('Resource Type'),
+        max_length=1024,
+        blank=True,
+        null=True)
+
     __is_approved = False
     __is_published = False
 
@@ -874,8 +884,11 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
         return "{0}".format(self.title)
 
     def _remove_html_tags(self, attribute_str):
-        pattern = re.compile('<.*?>')
-        return re.sub(pattern, '', attribute_str)
+        try:
+            pattern = re.compile('<.*?>')
+            return re.sub(pattern, '', attribute_str)
+        except Exception:
+            return attribute_str
 
     @property
     def raw_abstract(self):
@@ -901,6 +914,10 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
         """
         Send a notification when a resource is created or updated
         """
+        if not self.resource_type and self.polymorphic_ctype and \
+        self.polymorphic_ctype.model:
+            self.resource_type = self.polymorphic_ctype.model.lower()
+
         if hasattr(self, 'class_name') and (self.pk is None or notify):
             if self.pk is None and self.title:
                 # Resource Created
@@ -1099,8 +1116,14 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
             if bbox.srid != 4326:
                 bbox = bbox.transform(4326, clone=True)
             return str(bbox)
-        bbox = BBOXHelper.from_xy([-180, 180, -90, 90])
-        return [bbox.xmin, bbox.xmax, bbox.ymin, bbox.ymax, "EPSG:4326"]
+        else:
+            bbox = BBOXHelper.from_xy([-180, 180, -90, 90])
+            return bbox_to_wkt(
+                bbox.xmin,
+                bbox.xmax,
+                bbox.ymin,
+                bbox.ymax,
+                srid='EPSG:4326')
 
     @property
     def license_light(self):
@@ -1155,6 +1178,15 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
                         continue
                 filled_fields.append(field)
         return '{}%'.format(len(filled_fields) * 100 / len(required_fields))
+
+    @property
+    def instance_is_processed(self):
+        try:
+            if hasattr(self.get_real_instance(), "processed"):
+                return self.get_real_instance().processed
+            return False
+        except Exception:
+            return False
 
     def keyword_list(self):
         return [kw.name for kw in self.keywords.all()]
@@ -1427,8 +1459,6 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
 
         try:
             # Check that the image is valid
-            from PIL import Image
-            from io import BytesIO
             content_data = BytesIO(image)
             im = Image.open(content_data)
             im.verify()  # verify that it is, in fact an image
@@ -1454,8 +1484,6 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
 
                 try:
                     # Optimize the Thumbnail size and resolution
-                    from PIL import Image
-                    from resizeimage import resizeimage
                     _default_thumb_size = getattr(
                         settings, 'THUMBNAIL_GENERATOR_DEFAULT_SIZE', {'width': 240, 'height': 200})
                     im = Image.open(open(storage.path(_upload_path), mode='rb'))
@@ -1501,24 +1529,29 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
                 'Error when generating the thumbnail for resource %s. (%s)' %
                 (self.id, str(e)))
             logger.warn('Check permissions for file %s.' % upload_path)
-            Link.objects.filter(resource=self, name='Thumbnail').delete()
-            _thumbnail_url = staticfiles.static(settings.MISSING_THUMBNAIL)
-            obj, created = Link.objects.get_or_create(
-                resource=self,
-                name='Thumbnail',
-                defaults=dict(
-                    url=_thumbnail_url,
-                    extension='png',
-                    mime='image/png',
-                    link_type='image',
+            try:
+                Link.objects.filter(resource=self, name='Thumbnail').delete()
+                _thumbnail_url = staticfiles.static(settings.MISSING_THUMBNAIL)
+                obj, created = Link.objects.get_or_create(
+                    resource=self,
+                    name='Thumbnail',
+                    defaults=dict(
+                        url=_thumbnail_url,
+                        extension='png',
+                        mime='image/png',
+                        link_type='image',
+                    )
                 )
-            )
-            self.thumbnail_url = _thumbnail_url
-            obj.url = _thumbnail_url
-            obj.save()
-            ResourceBase.objects.filter(id=self.id).update(
-                thumbnail_url=_thumbnail_url
-            )
+                self.thumbnail_url = _thumbnail_url
+                obj.url = _thumbnail_url
+                obj.save()
+                ResourceBase.objects.filter(id=self.id).update(
+                    thumbnail_url=_thumbnail_url
+                )
+            except Exception as e:
+                logger.debug(
+                    'Error when generating the thumbnail for resource %s. (%s)' %
+                    (self.id, str(e)))
 
     def set_missing_info(self):
         """Set default permissions and point of contacts.
@@ -1790,9 +1823,10 @@ class CuratedThumbnail(models.Model):
             _upload_path = os.path.join(os.path.dirname(upload_path), actual_name)
             if not os.path.exists(_upload_path):
                 os.rename(upload_path, _upload_path)
+            return self.img_thumbnail.url
         except Exception as e:
             logger.exception(e)
-        return self.img_thumbnail.url
+        return ''
 
 
 class Configuration(SingletonModel):

@@ -271,9 +271,7 @@ class DocumentUploadView(CreateView):
 
         if bbox:
             bbox = BBOXHelper.from_xy(bbox)
-            Document.objects.filter(id=self.object.pk).update(
-                bbox_polygon=bbox.as_polygon()
-            )
+            self.object.bbox_polygon = bbox.as_polygon()
 
         if getattr(settings, 'SLACK_ENABLED', False):
             try:
@@ -434,7 +432,6 @@ def document_metadata(
                         'profile', ErrorList())
                     errors.append(
                         _('You must set a point of contact for this resource'))
-                    poc = None
             if poc_form.has_changed and poc_form.is_valid():
                 new_poc = poc_form.save()
 
@@ -451,7 +448,6 @@ def document_metadata(
                         'profile', ErrorList())
                     errors.append(
                         _('You must set an author for this resource'))
-                    metadata_author = None
             if author_form.has_changed and author_form.is_valid():
                 new_author = author_form.save()
 
@@ -475,7 +471,6 @@ def document_metadata(
                     args=(
                         document.id,
                     )))
-
         message = document.id
 
         try:

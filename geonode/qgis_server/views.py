@@ -19,17 +19,17 @@
 #########################################################################
 
 import io
+import os
+import re
 import json
 import logging
-import os
 import zipfile
-from imghdr import what as image_format
 
-import re
-
+import shutil
 import datetime
 import requests
-import shutil
+from imghdr import what as image_format
+
 from django.conf import settings
 from django.urls import reverse
 from django.forms.models import model_to_dict
@@ -88,18 +88,15 @@ def download_zip(request, layername):
 
     # The zip compressor
     zf = zipfile.ZipFile(s, "w", allowZip64=True)
+    with zf:
+        for fpath in filenames:
+            # Calculate path for file in zip
+            fdir, fname = os.path.split(fpath)
 
-    for fpath in filenames:
-        # Calculate path for file in zip
-        fdir, fname = os.path.split(fpath)
+            zip_path = os.path.join(zip_subdir, fname)
 
-        zip_path = os.path.join(zip_subdir, fname)
-
-        # Add file, at correct path
-        zf.write(fpath, zip_path)
-
-    # Must close zip for all contents to be written
-    zf.close()
+            # Add file, at correct path
+            zf.write(fpath, zip_path)
 
     # Grab ZIP file from in-memory, make response with correct MIME-type
     resp = HttpResponse(
@@ -160,28 +157,25 @@ def download_map(request, mapid):
 
     # The zip compressor
     zf = zipfile.ZipFile(s, "w", allowZip64=True)
+    with zf:
+        for map_layer in map_layers:
+            if 'osm' not in map_layer.layer_title and 'OpenMap' not in map_layer.layer_title:
+                layer = get_object_or_404(Layer, name=map_layer.layer_title)
+                qgis_layer = get_object_or_404(QGISServerLayer, layer=layer)
+                # Files (local path) to put in the .zip
+                filenames = qgis_layer.files
+                # Exclude qgis project files, because it contains server specific path
+                filenames = [f for f in filenames if f.endswith('.asc') or
+                             f.endswith('.shp') or f.endswith('.tif')]
 
-    for map_layer in map_layers:
-        if 'osm' not in map_layer.layer_title and 'OpenMap' not in map_layer.layer_title:
-            layer = get_object_or_404(Layer, name=map_layer.layer_title)
-            qgis_layer = get_object_or_404(QGISServerLayer, layer=layer)
-            # Files (local path) to put in the .zip
-            filenames = qgis_layer.files
-            # Exclude qgis project files, because it contains server specific path
-            filenames = [f for f in filenames if f.endswith('.asc') or
-                         f.endswith('.shp') or f.endswith('.tif')]
+                for fpath in filenames:
+                    # Calculate path for file in zip
+                    fdir, fname = os.path.split(fpath)
 
-            for fpath in filenames:
-                # Calculate path for file in zip
-                fdir, fname = os.path.split(fpath)
+                    zip_path = os.path.join(zip_subdir, fname)
 
-                zip_path = os.path.join(zip_subdir, fname)
-
-                # Add file, at correct path
-                zf.write(fpath, zip_path)
-
-    # Must close zip for all contents to be written
-    zf.close()
+                    # Add file, at correct path
+                    zf.write(fpath, zip_path)
 
     # Grab ZIP file from in-memory, make response with correct MIME-type
     resp = HttpResponse(
@@ -223,8 +217,13 @@ def legend(request, layername, layertitle=False, style=None):
         if qgis_layer.default_style:
             style = qgis_layer.default_style.name
 
+    tiles_directory = QGIS_SERVER_CONFIG['tiles_directory']
     legend_path = QGIS_SERVER_CONFIG['legend_path']
     legend_filename = legend_path % (qgis_layer.qgis_layer_name, style)
+    # GOOD -- Verify with normalised version of path
+    legend_filename = os.path.normpath(legend_filename)
+    if not legend_filename.startswith(tiles_directory):
+        return HttpResponseServerError()
 
     if not os.path.exists(legend_filename):
         if not os.path.exists(os.path.dirname(legend_filename)):
@@ -312,8 +311,13 @@ def tile(request, layername, z, x, y, style=None):
         if qgis_layer.default_style:
             style = qgis_layer.default_style.name
 
+    tiles_directory = QGIS_SERVER_CONFIG['tiles_directory']
     tile_path = QGIS_SERVER_CONFIG['tile_path']
     tile_filename = tile_path % (qgis_layer.qgis_layer_name, style, z, x, y)
+    # GOOD -- Verify with normalised version of path
+    tile_filename = os.path.normpath(tile_filename)
+    if not tile_filename.startswith(tiles_directory):
+        return HttpResponseServerError()
 
     if not os.path.exists(tile_filename):
 

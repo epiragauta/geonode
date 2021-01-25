@@ -34,7 +34,7 @@ import geonode.proxy.urls
 from . import views
 from . import version
 
-from geonode.api.urls import api
+from geonode.api.urls import api, router
 from geonode.api.views import verify_token, user_info, roles, users, admin_role
 from geonode.base.views import thumbnail_upload
 
@@ -106,14 +106,29 @@ urlpatterns = [
 
 urlpatterns += [
 
+    # ResourceBase views
+    url(r'^base/', include('geonode.base.urls')),
+
     # Layer views
     url(r'^layers/', include('geonode.layers.urls')),
+
+    # Remote Services views
+    url(r'^services/', include('geonode.services.urls')),
 
     # Map views
     url(r'^maps/', include('geonode.maps.urls')),
 
+    # Documents views
+    url(r'^documents/', include('geonode.documents.urls')),
+
+    # Apps views
+    url(r'^apps/', include('geonode.geoapps.urls')),
+
     # Catalogue views
     url(r'^catalogue/', include('geonode.catalogue.urls')),
+
+    # Group Profiles views
+    url(r'^groups/', include('geonode.groups.urls')),
 
     # ident
     url(r'^ident.json$',
@@ -157,11 +172,6 @@ urlpatterns += [
         geonode.views.moderator_contacted,
         name='moderator_contacted'),
 
-    url(r'^groups/', include('geonode.groups.urls')),
-    url(r'^documents/', include('geonode.documents.urls')),
-    url(r'^services/', include('geonode.services.urls')),
-    url(r'^base/', include('geonode.base.urls')),
-
     # OAuth Provider
     url(r'^o/',
         include('oauth2_provider.urls',
@@ -175,6 +185,9 @@ urlpatterns += [
     url(r'^api/roles', roles, name='roles'),
     url(r'^api/adminRole', admin_role, name='adminRole'),
     url(r'^api/users', users, name='users'),
+    url(r'^api/v2/', include(router.urls)),
+    url(r'^api/v2/', include('geonode.api.urls')),
+    url(r'^api/v2/api-auth/', include('rest_framework.urls', namespace='geonode_rest_framework')),
     url(r'', include(api.urls)),
 
     # Curated Thumbnail
@@ -193,7 +206,7 @@ urlpatterns += i18n_patterns(
 
 # Internationalization Javascript
 urlpatterns += [
-    url(r'^i18n/', include(django.conf.urls.i18n), name="i18n"),
+    url(r'i18n/', include('django_translation_flags.urls')),
     url(r'^jsi18n/$', JavaScriptCatalog.as_view(), js_info_dict, name='javascript-catalog')
 ]
 
@@ -274,18 +287,25 @@ urlpatterns += [
     url(r'^faq/', include('geonode.frequently.urls'), name='faq'),
 ]
 
-#cms
-urlpatterns += [url(r'^cms/', include('cms.urls')),
+# Search City
+urlpatterns += [
+    url(r'^search_city/', 
+    TemplateView.as_view(template_name='search_city.html'), name='search_city'),
 ]
 
 # Study Cases
 urlpatterns += [
-    url(r'^study_cases/', include('geonode.study_cases.urls'), name='study_cases'),
+    url(r'^study_cases/', include('geonode.waterproof_study_cases.urls'), name='study_cases'),
 ]
 
 # waterproof_nbs_ca
 urlpatterns += [
     url(r'^waterproof_nbs_ca/', include('geonode.waterproof_nbs_ca.urls'), name='waterproof_nbs_ca'),
+]
+
+# waterproof_intake
+urlpatterns += [
+    url(r'^intake/', include('geonode.waterproof_intake.urls'), name='waterproof_intake'),
 ]
 
 if settings.MONITORING_ENABLED:
