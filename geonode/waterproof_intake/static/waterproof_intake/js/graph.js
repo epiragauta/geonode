@@ -671,6 +671,7 @@ function onInit(editor) {
                 funcostdb.push({
                     'fields': {
                         'function_value': mathField.latex(),
+                        'function_py_value': $('#python-txt-area').val(),
                         'function_name': $('#costFunctionName').val() == '' ? 'Undefined name' : $('#costFunctionName').val(),
                         'function_description': $('#costFuntionDescription').val(),
                         'global_multiplier_factorCalculator': $('#global_multiplier_factorCalculator').val(),
@@ -707,6 +708,7 @@ function onInit(editor) {
                 temp.logical = JSON.stringify(temp.logical);
                 $.extend(funcostdb[CostSelected].fields, temp);
                 funcostdb[CostSelected].fields.function_value = mathField.latex();
+                funcostdb[CostSelected].fields.function_py_value = $('#python-txt-area').val();
             }
             selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
             $('#funcostgenerate div').remove();
