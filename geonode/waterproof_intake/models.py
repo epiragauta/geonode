@@ -137,6 +137,11 @@ class CostFunctionsProcess(models.Model):
         verbose_name=_('Function')
     )
 
+    function_py_value = models.CharField(
+        max_length=2500,
+        verbose_name=_('Python Function')
+    )
+
     function_name = models.CharField(
         max_length=250,
         verbose_name=_('Function name')
@@ -467,6 +472,13 @@ class UserCostFunctions(models.Model):
         verbose_name=_('Function')
     )
 
+    function_py_value = models.CharField(
+        max_length=2500,
+        null=True,
+        blank=True,
+        verbose_name=_('Python Function')
+    )
+
     template_function = models.ForeignKey(
         CostFunctionsProcess,
         on_delete=models.DO_NOTHING,
@@ -541,7 +553,7 @@ class UserLogicalFunctions(models.Model):
     )
 
     mainFunction = models.ForeignKey(UserCostFunctions, on_delete=models.CASCADE)
-    
+
 class ElementConnections(models.Model):
     source = models.ForeignKey(ElementSystem,  related_name="source", on_delete=models.CASCADE)
 
