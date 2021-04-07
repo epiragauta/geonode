@@ -213,6 +213,7 @@ urlpatterns += [
 
 urlpatterns += i18n_patterns(
     url(r'^grappelli/', include('grappelli.urls')),
+    url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^admin/', admin.site.urls, name="admin"),
     url(r'admin/doc/', include('django.contrib.admindocs.urls')),
 )

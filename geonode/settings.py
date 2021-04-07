@@ -328,11 +328,25 @@ _DEFAULT_STATICFILES_DIRS = [
 
 STATICFILES_DIRS = os.getenv('STATICFILES_DIRS', _DEFAULT_STATICFILES_DIRS)
 
+# Static content of Plotly components that should
+# be handled by the Django staticfiles infrastructure
+
+PLOTLY_COMPONENTS = [
+    'dash_core_components',
+    'dash_html_components',
+    'dash_renderer',
+    'dpd_components',
+    'dpd_static_support',
+]
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django_plotly_dash.finders.DashAssetFinder',
+    'django_plotly_dash.finders.DashComponentFinder',
+    'django_plotly_dash.finders.DashAppDirectoryFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -489,7 +503,7 @@ INSTALLED_APPS = (
     # Boostrap admin theme
     # 'django_admin_bootstrapped.bootstrap3',
     # 'django_admin_bootstrapped',
-
+    'jet',
     # Apps bundled with Django
     'modeltranslation',
     'dal',
@@ -562,6 +576,8 @@ INSTALLED_APPS = (
     # waterproof cms
     # 'waterproof',
     'geonode.waterproof_cms',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'dpd_static_support',
 
 )
 
@@ -819,6 +835,8 @@ MIDDLEWARE = (
     'geonode.base.middleware.MaintenanceMiddleware',
     'geonode.base.middleware.ReadOnlyMiddleware',   # a Middleware enabling Read Only mode of Geonode
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+    'django_plotly_dash.middleware.BaseMiddleware',
+    'django_plotly_dash.middleware.ExternalRedirectionMiddleware',
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
