@@ -382,7 +382,7 @@ def createStepTwo(request):
                                                     currency=currency,
                                                     user=request.user,
                                                     element_system = element_system,
-                                                    intake = intake,
+                                                    intake = existingIntake,
                                                 )
 
                                             if ('logical' in function['fields']):
@@ -463,7 +463,7 @@ def createStepTwo(request):
                                         template_function=templateFunction,
                                         user=request.user,
                                         element_system = element_system,
-                                        intake = intake,
+                                        intake = existingIntake,
                                     )
                                     if ('logical' in function['fields']):
                                         print("Saving logical function for connection")
