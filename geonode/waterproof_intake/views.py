@@ -323,7 +323,9 @@ def createStepTwo(request):
                                                 function=function['fields']['function_value'],
                                                 currency=currency,
                                                 template_function=templateFunction,
-                                                user=request.user
+                                                user=request.user,
+                                                element_system = element_system,
+                                                intake = intake,
                                             )
                                             print(mainFunction)
                                             if ('logical' in function['fields']):
@@ -378,7 +380,9 @@ def createStepTwo(request):
                                                     function=function['fields']['function_value'],
                                                     template_function=templateFunction,
                                                     currency=currency,
-                                                    user=request.user
+                                                    user=request.user,
+                                                    element_system = element_system,
+                                                    intake = existingIntake,
                                                 )
 
                                             if ('logical' in function['fields']):
@@ -457,7 +461,9 @@ def createStepTwo(request):
                                         function=function['fields']['function_value'],
                                         currency=currency,
                                         template_function=templateFunction,
-                                        user=request.user
+                                        user=request.user,
+                                        element_system = element_system,
+                                        intake = existingIntake,
                                     )
                                     if ('logical' in function['fields']):
                                         print("Saving logical function for connection")
