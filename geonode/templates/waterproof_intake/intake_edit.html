@@ -467,7 +467,18 @@
                 <div class="row">
                     <div class="col-md-12">
                         <h5 class="text-primary">Math expression</h5>
-                        <span id="math-field" class="form-control" style="height: auto;"></span>
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#mathNatural" data-toggle="tab">{% trans "Natural" %}</a></li>                            
+                            <li><a href="#mathPython" data-toggle="tab" >{% trans "Python" %}</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="mathNatural" class="tab-pane fade in active">
+                                <span id="math-field" class="form-control" style="height: auto;"></span>
+                            </div>                            
+                            <div id="mathPython" class="tab-pane fade in active">
+                                <textarea id="python-txt-area" style="height:100px;width:100%;"></textarea>
+                            </div>
+                        </div>                        
                     </div>
                 </div>
                 <!--<div class="row">

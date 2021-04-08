@@ -11,12 +11,14 @@
 </script>
 <div class="page-header">
     <h1>{% trans "Create water intake" %}</h1>
-    <h4 class="title-city">{% trans "Intake creation city" %} <span id="cityLabel"></span> </h4>
+    <h4 class="title-city">{% trans "Intake creation city" %} <span id="cityLabel"></span> </h4>    
 </div>
+<br>
 <!--Begin Form-->
 <form id="form" method="POST" action="">
     {% csrf_token %}
     <!--Start smartwizard-->
+    <br>
     <div id="smartwizard">
         <!--panel of navigation-->
         <ul class="nav">
@@ -88,7 +90,7 @@
                 <!-- Map -->
                 <div id="map">
                     <div id="analysisOptions">
-                        <button type="button" class="btn btn-default" id="validateBtn">{% trans "Draw Basin" %}</button>
+                        <button type="button" class="btn btn-default" id="validateBtn">Draw Basin</button>
                     </div>
                 </div>
                 <br>
@@ -447,12 +449,12 @@
                             <label class="text-primary">{% trans "Multiplying factor for overrall cost" %} </label>
                             <input type="text" id="global_multiplier_factorCalculator" class="form-control" disabled>
                         </div>
-                        <h5 class="text-primary">{% trans "Syntax keyboard"%}</h5>
+                        <h5 class="text-primary">Syntax keyboard</h5>
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#mathBasic_tab" data-toggle="tab">{% trans "Basic"%}</a></li>
-                            <li><a href="#mathAdvanced_tab" data-toggle="tab" >{% trans "Advanced"%}</a></li>
-                            <li><a href="#mathTrigonometry_tab" data-toggle="tab" >{% trans "Trigonometry"%}</a></li>
-                            <li><a href="#mathLogical_tab" data-toggle="tab" >{% trans "Logical"%}</a></li>
+                            <li class="active"><a href="#mathBasic_tab" data-toggle="tab">Basic</a></li>
+                            <li><a href="#mathAdvanced_tab" data-toggle="tab" >Advanced</a></li>
+                            <li><a href="#mathTrigonometry_tab" data-toggle="tab" >Trigonometry</a></li>
+                            <li><a href="#mathLogical_tab" data-toggle="tab" >Logical</a></li>
                         </ul>
                         <div class="tab-content">
                             <div id="mathBasic_tab" class="tab-pane fade in active">

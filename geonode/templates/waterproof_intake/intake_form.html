@@ -11,8 +11,7 @@
 </script>
 <div class="page-header">
     <h1>{% trans "Create water intake" %}</h1>
-    <h4 class="title-city">{% trans "Intake creation city" %} <span id="cityLabel"></span> </h4>
-    
+    <h4 class="title-city">{% trans "Intake creation city" %} <span id="cityLabel"></span> </h4>    
 </div>
 <br>
 <!--Begin Form-->
@@ -509,6 +508,7 @@
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#mathNatural" data-toggle="tab">{% trans "Natural" %}</a></li>
                             <li><a href="#mathLogical" data-toggle="tab" >{% trans "Logical" %}</a></li>
+                            <li><a href="#mathPython" data-toggle="tab" >{% trans "Python" %}</a></li>
                         </ul>
                         <div class="tab-content">
                             <div id="mathNatural" class="tab-pane fade in active">
@@ -545,13 +545,16 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div id="mathPython" class="tab-pane fade in active">
+                                <textarea id="python-txt-area" style="height:100px;width:100%;"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <br>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveAndValideCost">Valide and add cost</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
+                    <button type="button" class="btn btn-primary" id="saveAndValideCost">{% trans "Valide and add cost" %}</button>
                 </div>
             </div>
         </div>

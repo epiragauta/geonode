@@ -383,7 +383,9 @@ function onInit(editor) {
             spaceBehavesLikeTab: true,
             handlers: {
                 edit: function() {
-                    latexSpan.textContent = mathField.latex();
+                    if (latexSpan != undefined){
+                        latexSpan.textContent = mathField.latex();
+                    }   
                 }
             }
         });
@@ -511,6 +513,7 @@ function onInit(editor) {
 
         $('#saveAndValideCost').click(function() {
             funcostdb[CostSelected].fields.function_value = mathField.latex();
+            funcostdb[CostSelected].fields.function_py_value = $('#python-txt-area').val();
             selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
             $('#funcostgenerate div').remove();
             for (let index = 0; index < funcostdb.length; index++) {
