@@ -62,10 +62,27 @@
     background: red;
     cursor: inherit;
     display: block;
-  }
+}
 
 .modal {
     text-align: center;
+}
+
+#makeMeDroppable {
+    float: left;
+    margin: 50px;
+    width: 500px;
+    height: 300px;
+    border: 1px solid #999;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.modal-body {
+    width: 100%;
+    overflow-y: auto;
 }
 
 @media screen and (min-width: 768px) {

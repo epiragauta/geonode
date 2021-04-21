@@ -418,7 +418,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="CalculatorModalLabel"></h4>
+                <h4 class="modal-title" id="CalculatorModalLabel" valueid=""></h4>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -432,7 +432,7 @@
                         </div>
                         <div class="form-group">
                             <label class="text-primary">Cost function description</label>
-                            <textarea id="costFuntionDescription" rows="3" class="form-control"></textarea>
+                            <textarea id="costFuntionDescription" rows="2" class="form-control"></textarea>
                         </div>
                         <div class="form-group">
                             <label class="text-primary">{% trans "Currency for definition of costs" %} </label>
@@ -450,6 +450,7 @@
                             <label class="text-primary">{% trans "Multiplying factor for overrall cost" %} </label>
                             <input type="text" id="global_multiplier_factorCalculator" class="form-control" disabled>
                         </div>
+                        <!--
                         <h5 class="text-primary">Syntax keyboard</h5>
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#mathBasic_tab" data-toggle="tab">Basic</a></li>
@@ -501,8 +502,28 @@
                                 </div>
                             </div>
                         </div>
+                        -->
                     </div>
                 </div>
+                 <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="text-primary">Math expression</h5>
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#mathNatural" data-toggle="tab">Natural</a></li>
+                            <li><a href="#mathLogical" data-toggle="tab" >Logical</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="mathNatural" class="tab-pane fade in active">
+                                <!--<div id="makeMeDroppable"></div>-->
+                                <textarea id="math-field" class="form-control" rows="6"></textarea>
+                            </div>
+                            <div id="mathLogical" class="tab-pane fade">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--
                 <div class="row">
                     <div class="col-md-12">
                         <h5 class="text-primary">Math expression</h5>
@@ -548,6 +569,7 @@
                         </div>
                     </div>
                 </div>
+                -->
                 <br>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

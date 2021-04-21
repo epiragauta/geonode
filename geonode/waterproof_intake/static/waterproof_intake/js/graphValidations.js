@@ -98,6 +98,7 @@ function updateStyleLine(graph, cell, type) {
                             label = connectionsType[obj.connectorType].name;
                             $('#titleDiagram').text(connectionsType[obj.connectorType].name);
                             $('#titleCostFunSmall').text(`ID: ${cell.id} - ${connectionsType[obj.connectorType].name}`);
+                            $('#titleCostFunSmall').attr("valueid", element.id);
                             addData2HTML(dbfields, cell)
                         } catch (e) {
                             label = "";
@@ -133,9 +134,10 @@ function funcost(ecuation_db, ecuation_name, index, MQ) {
             <p name="render_ecuation" style="font-size: 1.8rem; width:92%">${ ecuation_db }</p>
         </div>
     `);
+    /*
     $('p[name=render_ecuation]').each(function() {
         MQ.StaticMath(this);
-    });
+    });*/
 }
 
 function addData(element, MQ) {
@@ -145,6 +147,7 @@ function addData(element, MQ) {
         let dbfields = obj.resultdb;
         label = connectionsType[obj.connectorType].name;
         $('#titleDiagram').text(connectionsType[obj.connectorType].name);
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${connectionsType[obj.connectorType].name}`);
         $('#idDiagram').val(element.id);
         addData2HTML(dbfields, element)
@@ -154,6 +157,7 @@ function addData(element, MQ) {
         }
     } else {
         $('#titleDiagram').text(element.getAttribute('name'));
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${element.getAttribute('name')}`);
         $('#idDiagram').val(element.id);
         if (element.getAttribute('resultdb') == undefined && element.getAttribute('funcost') == undefined) return;
@@ -426,6 +430,7 @@ function addDataView(element, MQ) {
         let dbfields = obj.resultdb;
         label = connectionsType[obj.connectorType].name;
         $('#titleDiagram').text(connectionsType[obj.connectorType].name);
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${connectionsType[obj.connectorType].name}`);
         $('#idDiagram').val(element.id);
         addData2HTMLView(dbfields)
@@ -435,6 +440,7 @@ function addDataView(element, MQ) {
         }
     } else {
         $('#titleDiagram').text(element.getAttribute('name'));
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${element.getAttribute('name')}`);
         $('#idDiagram').val(element.id);
         if (element.getAttribute('resultdb') == undefined && element.getAttribute('funcost') == undefined) return;
@@ -462,9 +468,10 @@ function funcostView(ecuation_db, ecuation_name, index, MQ) {
         <p name="render_ecuation">${ ecuation_db }</p>
     </div>
     `);
+    /*
     $('p[name=render_ecuation]').each(function() {
         MQ.StaticMath(this);
-    });
+    });*/
 }
 
 function clearDataHtmlView() {
