@@ -50,6 +50,51 @@ $(function () {
                 })
             }
         });
+        $('.btn-danger').click(function (evt) {
+            Swal.fire({
+                title: gettext('Delete NBS'),
+                text: gettext("Are you sure?") + gettext("You won't be able to revert this!"),
+                icon: 'warning',
+                showCancelButton: false,
+                showDenyButton: true,
+                confirmButtonColor: '#d33',
+                denyButtonColor: '#3085d6',
+                confirmButtonText: gettext('Yes, delete it!'),
+                denyButtonText: gettext('Cancel')
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    nbsId = evt.currentTarget.getAttribute('data-id')
+                    /** 
+                    * Get filtered activities by transition id 
+                    * @param {String} url   activities URL 
+                    * @param {Object} data  transition id  
+                    *
+                    * @return {String} activities in HTML option format
+                    */
+                    $.ajax({
+                        url: '/waterproof_nbs_ca/delete/' + nbsId,
+                        type: 'POST',
+                        success: function (result) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: gettext('Great!'),
+                                text: gettext('The NBS has been deleted')
+                            })
+                            setTimeout(function () { location.href = "/waterproof_nbs_ca/"; }, 1000);
+                        },
+                        error: function (error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: gettext('Error!'),
+                                text: gettext('The NBS has not been deleted, try again!')
+                            })
+                        }
+                    });
+                } else if (result.isDenied) {
+                    return;
+                }
+            })
+        });
         fillTransitionsDropdown(transitionsDropdown);
         submitFormEvent();
         changeCountryEvent(countryDropdown, currencyDropdown);
@@ -72,8 +117,6 @@ $(function () {
             formData.append('maxBenefitTime', $('#maxBenefitTime').val());
             // NBS Percentage of benefit associated with interventions at time t=0
             formData.append('benefitTimePorc', $('#benefitTimePorc').val());
-            // NBS Consecution Time Total Benefits
-            formData.append('totalConsecTime', $('#totalConsecTime').val());
             // NBS Maintenance Perodicity
             formData.append('maintenancePeriod', $('#maintenancePeriod').val());
             // NBS Unit Implementation Cost (US$/ha)
@@ -203,16 +246,16 @@ $(function () {
 
         function updateDropdownCountry(feature) {
             let mapClick = true;
-           
+
             let layerClicked = feature.target;
             if (lastClickedLayer) {
                 lastClickedLayer.setStyle(defaultStyle);
             }
             layerClicked.setStyle(highlighPolygon);
             let countryCode = feature.sourceTarget.feature.id;
-            
+
             $.ajax({
-                url: '/waterproof_nbs_ca/load-countryByCode/',
+                url: '/parameters/load-countryByCode/',
                 data: {
                     'code': countryCode
                 },
@@ -224,7 +267,7 @@ $(function () {
                     udpateCreateUrl(countryId);
                     //
                     $.ajax({
-                        url: '/waterproof_nbs_ca/load-regionByCountry/',
+                        url: '/parameters/load-regionByCountry/',
                         data: {
                             'country': countryId
                         },
@@ -235,13 +278,13 @@ $(function () {
                         }
                     });
                     $.ajax({
-                        url: '/waterproof_nbs_ca/load-currencyByCountry/',
+                        url: '/parameters/load-currencyByCountry/',
                         data: {
                             'country': countryId
                         },
                         success: function (result) {
                             result = JSON.parse(result);
-                            $('#currencyLabel').text('('+result[0].fields.code+') - '+result[0].fields.name);
+                            $('#currencyLabel').text('(' + result[0].fields.currency + ') - ' + result[0].fields.name);
                         }
                     });
                 }
@@ -251,7 +294,8 @@ $(function () {
         //map.on('click', onMapClick);
     }
     udpateCreateUrl = function (countryId) {
-       $('#createUrl').attr('href','create/'+countryId)
+        $('#createUrl').attr('href', 'create/' + countryId)
+        $('#nbs-createUrl').attr('href', 'create/' + countryId)
     };
     /** 
     * Get the transformations selected
@@ -294,14 +338,14 @@ $(function () {
              * @return {String} activities in HTML option format
              */
             $.ajax({
-                url: '/waterproof_nbs_ca/load-currencyByCountry/',
+                url: '/parameters/load-currencyByCountry/',
                 data: {
                     'country': country_id
                 },
                 success: function (result) {
                     result = JSON.parse(result);
                     currencyDropdown.val(result[0].pk);
-                    $('#currencyLabel').text('(' + result[0].fields.code + ') - ' + result[0].fields.name);
+                    $('#currencyLabel').text('(' + result[0].fields.currency + ') - ' + result[0].fields.name);
                     $('#countryLabel').text(countryName);
                     /** 
                      * Get filtered activities by transition id 
@@ -311,7 +355,7 @@ $(function () {
                      * @return {String} activities in HTML option format
                      */
                     $.ajax({
-                        url: '/waterproof_nbs_ca/load-regionByCountry/',
+                        url: '/parameters/load-regionByCountry/',
                         data: {
                             'country': country_id
                         },
@@ -338,12 +382,17 @@ $(function () {
                 }
             }
         });
-    
+
     }
     /** 
      * Validate input file on change
      * @param {HTML} dropdown Dropdown selected element
      */
+
+  
+
+
+
     changeFileEvent = function () {
         $('#restrictedArea').change(function (evt) {
             var file = evt.currentTarget.files[0];

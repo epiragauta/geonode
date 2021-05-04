@@ -5971,8 +5971,8 @@ button.close {
   background-color: #000;
 }
 .modal-backdrop.fade {
-  filter: alpha(opacity=0);
-  opacity: 0;
+  filter: alpha(opacity=0.5);
+  opacity: 0.5;
 }
 .modal-backdrop.in {
   filter: alpha(opacity=50);
@@ -8488,6 +8488,14 @@ form-inline {
   background-repeat: no-repeat;
   background-size:cover;
 }
+.imgbackgroundSystemop{
+  background: url(/static/geonode/img/bgSystemOperating.png);
+  height: 600px;
+  min-height: 100%;
+  min-width: 100%;
+  background-repeat: round;
+  background-size:cover;
+}
 .backgroundcolorwiki{
   background-color: #0C89AAAD;
 }
@@ -8801,4 +8809,11 @@ top:50px;
 .img-icon{
   width: 16px;
   height: 24px;
+}
+
+.img-underconstruction {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }

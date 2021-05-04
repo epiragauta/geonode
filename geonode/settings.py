@@ -105,14 +105,14 @@ if not SITEURL.endswith('/'):
     SITEURL = '{}/'.format(SITEURL)
 
 DATABASE_URL = os.getenv(
-      'DATABASE_URL',
-      'spatialite:///{path}'.format(
-          path=os.path.join(PROJECT_ROOT, 'development.db')
-      )
- )
+    'DATABASE_URL',
+    'spatialite:///{path}'.format(
+        path=os.path.join(PROJECT_ROOT, 'development.db')
+    )
+)
 
 #DATABASE_URL='postgresql://geonode:{&Uid&QXZ&6f;|F@dev.skaphe.com:5432/geonode'
-#DATABASE_URL='postgresql://geonode:geonode@localhost:5432/geonode'
+DATABASE_URL='postgresql://geonode:geonode@localhost:5432/geonode'
 
 if DATABASE_URL.startswith("spatialite"):
     try:
@@ -472,7 +472,9 @@ GEONODE_INTERNAL_APPS = (
     'geonode.waterproof_study_cases',
     'geonode.waterproof_nbs_ca',
     'geonode.waterproof_intake',
+    'geonode.waterproof_parameters',
     'geonode.waterproof_treatment_plants',
+    'geonode.waterproof_reports',
 )
 
 GEONODE_CONTRIB_APPS = (
@@ -1043,8 +1045,8 @@ OGC_SERVER_DEFAULT_USER = os.getenv(
 )
 
 OGC_SERVER_DEFAULT_PASSWORD = os.getenv(
-    'GEOSERVER_ADMIN_PASSWORD', 'geoserver',
-#    'GEOSERVER_ADMIN_PASSWORD', '{&Uid&QXZ&6f;|F'
+#    'GEOSERVER_ADMIN_PASSWORD', 'geoserver',
+    'GEOSERVER_ADMIN_PASSWORD', '{&Uid&QXZ&6f;|F'
 )
 
 GEOFENCE_SECURITY_ENABLED = False if TEST and not INTEGRATION else ast.literal_eval(
@@ -2210,6 +2212,9 @@ WATERPROOF_NBS_CA_ALLOW_ANONYMOUS = True
 
 WATERPROOF_API_SERVER = "/proxy/?url=http://dev.skaphe.com:8000/"
 
+WATERPROOF_INVEST_API="http://dev.skaphe.com:8000/"
+WATERPROOF_MODELS_PY3_API="http://dev.skaphe.com:8000/"
+WATERPROOF_MODELS_PY2_API="http://dev.skaphe.com:5050/"
 SEARCH_CITY_API_URL = '/proxy/?url=https://photon.komoot.io/api/?'
 
 SEARCH_COUNTRY_API_URL = "https://restcountries.eu/rest/v2/alpha/"

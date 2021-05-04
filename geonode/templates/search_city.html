@@ -11,6 +11,12 @@
 {% endblock %}
 
 {% block body_outer %}
+
+<div class="page-header">
+    <h1>{% trans "Search your city" %}</h1>
+    <h6>{% trans "In this section you can consult the case studies configured in the system or start the configuration of a case study" %}</h6>
+</div>
+
     <div class="row">
         <div class="col-md-4">
             <h4 class="text-center" id="countryLabel"></h4>
@@ -161,8 +167,8 @@
 
     function showSearchPoints (geojson) {
         searchPoints.clearLayers();
-        let geojsonFilter = geojson.features.filter(feature  => feature.properties.type == "city");
-        searchPoints.addData(geojsonFilter);
+        //let geojsonFilter = geojson.features.filter(feature  => (feature.properties.type == "city"));
+        searchPoints.addData(geojson);
     }
 
     function selectedResultHandler(feat){
@@ -185,9 +191,10 @@
         localStorage.setItem('city', cityName);
 
         let urlAPI = '{{ SEARCH_COUNTRY_API_URL }}' + countryCode;
+        console.log(urlAPI)
 
         $.get(urlAPI, function(data){
-            //console.log(data);
+            console.log("data en buscar ciudad es:"+data.region);
             $("#regionLabel").html(data.region);
             $("#currencyLabel").html(data.currencies[0].name + " - " + data.currencies[0].symbol);
             $("#listIntakes").show();

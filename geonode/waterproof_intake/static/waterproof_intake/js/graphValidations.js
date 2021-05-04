@@ -5,10 +5,6 @@ const connectionsType = {
     CN: { name: 'Connection', id: 'CN', style: 'CONNECTION', funcionreference: 'CON' },
 }
 
-function customMenuForConnectors() {
-
-}
-
 // Function to create the entries in the popupmenu
 function createPopupMenu(graph, menu, cell, evt) {
     if (cell != null) {
@@ -101,6 +97,7 @@ function updateStyleLine(graph, cell, type) {
                             let dbfields = obj.resultdb;
                             label = connectionsType[obj.connectorType].name;
                             $('#titleDiagram').text(connectionsType[obj.connectorType].name);
+                            $('#titleCostFunSmall').attr("valueid", element.id);
                             $('#titleCostFunSmall').text(`ID: ${cell.id} - ${connectionsType[obj.connectorType].name}`);
                             addData2HTML(dbfields, cell)
                         } catch (e) {
@@ -125,18 +122,34 @@ function clearDataHtml() {
     $('#sedimentosDiagram').val('');
     $('#nitrogenoDiagram').val('');
     $('#fosforoDiagram').val('');
-    $('#funcostgenerate div').remove();
+    $('#funcostgenerate tr').remove();
     $('#funcostgenerate').empty();
 }
 
-function funcost(ecuation_db, ecuation_name, index, MQ) {
+function funcost(index, MQ) {
     $('#funcostgenerate').append(
-        `<div class="alert alert-info" role="alert" idvalue="fun_${index}" style="margin-bottom: 12px">
-        <a name="glyphicon-trash" idvalue="${index}" class="alert-link close" style="opacity: 1"><span class="glyphicon glyphicon-trash text-danger" aria-hidden="true"></span></a>
-        <h4>${ecuation_name}</h4><a name="glyphicon-edit" idvalue="${index}" class="alert-link close" style="opacity: 1"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-        <p name="render_ecuation">${ ecuation_db }</p>
-    </div>
-    `);
+        `
+    <tr idvalue="fun_${index}">
+        <td aling="center">${funcostdb[index].fields.function_name}</td>
+        <td class="small text-center vat" style="width: 160px">
+        <a class="btn btn-info" idvalue="${index}" name="fun_display_btn">fx</a>
+        <div id="fun_display_${index}" style="position: absolute; left: 50%; width: auto; display: none">
+        <div class="alert alert-info mb-0" style="position: relative; left: -50%; bottom: -10px;" role="alert">
+        <p name="render_ecuation" style="font-size: 1.8rem; width:100%;">${ funcostdb[index].fields.function_value }</p>
+         </div>
+        </div>
+        </td>
+        <td class="small text-center vat">${funcostdb[index].fields.currencyCost}</td>
+        <td class="small text-center vat">${funcostdb[index].fields.global_multiplier_factorCalculator}</td>
+        <td class="small text-center vat" style="width: 85px">
+        <a class="btn btn-info" name="glyphicon-edit" idvalue="${index}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
+        <a class="btn btn-danger" name="glyphicon-trash" idvalue="${index}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+        </td>
+
+    </tr>
+    `
+    );
+
     $('p[name=render_ecuation]').each(function() {
         MQ.StaticMath(this);
     });
@@ -149,15 +162,17 @@ function addData(element, MQ) {
         let dbfields = obj.resultdb;
         label = connectionsType[obj.connectorType].name;
         $('#titleDiagram').text(connectionsType[obj.connectorType].name);
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${connectionsType[obj.connectorType].name}`);
         $('#idDiagram').val(element.id);
         addData2HTML(dbfields, element)
         funcostdb = obj.funcost;
         for (let index = 0; index < funcostdb.length; index++) {
-            funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
+            funcost(index, MQ);
         }
     } else {
         $('#titleDiagram').text(element.getAttribute('name'));
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${element.getAttribute('name')}`);
         $('#idDiagram').val(element.id);
         if (element.getAttribute('resultdb') == undefined && element.getAttribute('funcost') == undefined) return;
@@ -171,7 +186,7 @@ function addData(element, MQ) {
         $('#titleDiagram').text(resultdb[0].fields.categorys);
         addData2HTML(resultdb, element);
         for (let index = 0; index < funcostdb.length; index++) {
-            funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
+            funcost(index, MQ);
 
         }
     }
@@ -188,7 +203,7 @@ function addData2HTML(resultdb, cell) {
     $('#sedimentosDiagram').prop('disabled', show);
     $('#nitrogenoDiagram').prop('disabled', show);
     $('#fosforoDiagram').prop('disabled', show);
-    $('#funcostgenerate div').remove();
+    $('#funcostgenerate tr').remove();
     $('#funcostgenerate').empty();
     // Add Value to Panel Information Right on HTML
     $('#aguaDiagram').val(resultdb[0].fields.predefined_transp_water_perc);
@@ -207,7 +222,7 @@ function addData2HTML(resultdb, cell) {
 }
 
 function deleteWithValidations(editor) {
-    let msg = "Selected element is connected with Extraction connection element. Can't be deleted!";
+    let msg = gettext("Selected element is connected with Extraction connection element. Can't be deleted!");
     if (editor.graph.isEnabled()) {
         let cells = editor.graph.getSelectionCells();
         let cells2Remove = cells.filter(cell => (cell.style != "rio") || parseInt(cell.id) > 4);
@@ -230,7 +245,7 @@ function deleteWithValidations(editor) {
             }
 
         } else {
-            mxUtils.alert(`The River can't be Removed`);
+            mxUtils.alert(gettext(`The River can't be Removed`));
         }
     }
 }
@@ -269,11 +284,15 @@ function validationTransportedWater(editor, cell) {
                 let cells = JSON.parse(cellfilter.getAttribute('resultdb'));
                 //Validates sumatory of connectors it's less than %Transported water of the Symbol
                 if (total > cells[0].fields.predefined_transp_water_perc) {
+                    let texttitle = gettext("The sum of % of transported water from the Outgoing connectors of %s cannot be greater than %s %");
+                    let transtitle = interpolate(texttitle, [cellfilter.getAttribute('label'), cells[0].fields.predefined_transp_water_perc]);
+                    let texttext = gettext("The sum of % of water transported from the connectors is %s %");
+                    let transtext = interpolate(texttext, [total]);
                     $('#aguaDiagram').val('');
                     Swal.fire({
                         icon: 'warning',
-                        title: `La suma de % de agua transportada de los conectores Salientes de ${cellfilter.getAttribute('label')} no puede ser mayor a ${cells[0].fields.predefined_transp_water_perc}%`,
-                        text: `La suma de % de agua transportada de los conectores es ${total}%`
+                        title: transtitle,
+                        text: transtext
                     })
                 }
             }
@@ -286,22 +305,32 @@ $(document).on('click', '#helpgraph', function() {
 });
 
 var validateinput = function(e) {
+    let minRange = e.getAttribute('min');
+    let maxRange = e.getAttribute('max');
     var t = e.value;
     e.value = (t.indexOf(".") >= 0) ? (t.substr(0, t.indexOf(".")) + t.substr(t.indexOf("."), 3)) : t;
     if (parseFloat(e.value) < parseFloat(e.getAttribute('min'))) {
+        let texttitle = gettext("The value must be between %s and %s");
+        let transtitle = interpolate(texttitle, [minRange, maxRange]);
+        let text = gettext(`The minimun value is %s please use the arrows`)
+        let transtext = interpolate(text, [maxRange]);
         e.value = e.getAttribute('min');
         Swal.fire({
             icon: 'warning',
-            title: `The value must be between ${e.getAttribute('min')} and ${e.getAttribute('max')}`,
-            text: `The minimun value is ${e.getAttribute('min')} please use the arrows`
+            title: transtitle,
+            text: transtext
         });
     }
     if (parseFloat(e.value) > parseFloat(e.getAttribute('max'))) {
+        let texttitle = gettext("The value must be between %s and %s");
+        let transtitle = interpolate(texttitle, [minRange, maxRange]);
+        let text = gettext(`The maximum value is %s please use the arrows`)
+        let transtext = interpolate(text, [maxRange]);
         e.value = e.getAttribute('max');
         Swal.fire({
             icon: 'warning',
-            title: `The value must be between ${e.getAttribute('min')} and ${e.getAttribute('max')}`,
-            text: `The maximum value is ${e.getAttribute('max')} please use the arrows`
+            title: transtitle,
+            text: transtext
         });
     }
 }
@@ -316,11 +345,14 @@ function validationsCsinfraExternal(valida) {
     if (mxcell.includes("EXTRACTIONCONNECTION") == false) message.push('(Extraction Connection)');
     if (message[1] == undefined) message[1] = "";
     if (message[0] == undefined) return;
+
+    const texttitle = gettext("No exist %s %s in a diagram");
+    const transtext = interpolate(texttitle, [message[0], message[1]]);
     $('#hideCostFuntion').hide();
     Swal.fire({
         icon: 'warning',
-        title: `Missing elements`,
-        text: `No exist ${message[0]} ${message[1]} in a diagram`
+        title: gettext(`Missing elements`),
+        text: transtext
     });
     return true;
 }
@@ -348,23 +380,55 @@ function validationsNodeAlone(data) {
     }
 }
 
+function validationInputTransportedWater(graphic) {
+    let data2 = [];
+    data2 = Object.values(graphic.cells);
+    for (const it of data2) {
+        if (typeof(it.value) == "string") {
+            if (it.value === "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: gettext(`Exist a connector whitout defined type`)
+                })
+                return true;
+            } else {
+                const valiu = JSON.parse(it.value)
+                parseInt(valiu.resultdb[0].fields.predefined_transp_water_perc)
+                if (parseInt(valiu.resultdb[0].fields.predefined_transp_water_perc) < 0) {
+                    const texttitle = gettext("Element %s - %s has a % transported water invalid");
+                    const transtext = interpolate(texttitle, [it.id, valiu.resultdb[0].fields.categorys]);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: gettext(`Percentage transported water invalid`),
+                        text: transtext
+                    })
+                    return true;
+                }
+            }
+        }
+    }
+}
+
 function mensajeAlert(fin) {
+
+    const texttitle = gettext("Element %s - %s is disconnect");
+    const transtext = interpolate(texttitle, [fin.id, fin.getAttribute('name')]);
     Swal.fire({
         icon: 'warning',
-        title: `Disconnected elements`,
-        text: `Element ${fin.id} - ${fin.getAttribute('name')} is disconnect`
+        title: gettext(`Disconnected elements`),
+        text: transtext
     })
 }
 
 function validations(validate, editor) {
 
-    if (validationsCsinfraExternal(validate) == true || validationsNodeAlone(editor) == true) {
+    if (validationsCsinfraExternal(validate) == true || validationsNodeAlone(editor) == true || validationInputTransportedWater(editor) == true) {
         return true
     } else {
         if (banderaValideGraph != 0) {
             Swal.fire({
                 icon: 'success',
-                title: `Graph validated`,
+                title: gettext(`Graph validated`),
             });
             return false;
         }
@@ -381,6 +445,7 @@ function addDataView(element, MQ) {
         let dbfields = obj.resultdb;
         label = connectionsType[obj.connectorType].name;
         $('#titleDiagram').text(connectionsType[obj.connectorType].name);
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${connectionsType[obj.connectorType].name}`);
         $('#idDiagram').val(element.id);
         addData2HTMLView(dbfields)
@@ -390,6 +455,7 @@ function addDataView(element, MQ) {
         }
     } else {
         $('#titleDiagram').text(element.getAttribute('name'));
+        $('#titleCostFunSmall').attr("valueid", element.id);
         $('#titleCostFunSmall').text(`ID: ${element.id} - ${element.getAttribute('name')}`);
         $('#idDiagram').val(element.id);
         if (element.getAttribute('resultdb') == undefined && element.getAttribute('funcost') == undefined) return;
@@ -434,7 +500,7 @@ function clearDataHtmlView() {
     $('#sedimentosDiagram').val('');
     $('#nitrogenoDiagram').val('');
     $('#fosforoDiagram').val('');
-    $('#funcostgenerate div').remove();
+    $('#funcostgenerate tr').remove();
     $('#funcostgenerate').empty();
 }
 
@@ -444,7 +510,7 @@ function addData2HTMLView(resultdb) {
     $('#sedimentosDiagram').prop('disabled', show);
     $('#nitrogenoDiagram').prop('disabled', show);
     $('#fosforoDiagram').prop('disabled', show);
-    $('#funcostgenerate div').remove();
+    $('#funcostgenerate tr').remove();
     $('#funcostgenerate').empty();
     // Add Value to Panel Information Right on HTML
     $('#aguaDiagram').val(resultdb[0].fields.predefined_transp_water_perc);

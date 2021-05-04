@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GeoNode\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-03 17:08-0500\n"
+"POT-Creation-Date: 2021-02-11 20:03-0500\n"
 "PO-Revision-Date: 2020-12-15 18:41-0500\n"
 "Last-Translator: Julien Collaer <julien.collaer@opengeode.be>\n"
 "Language-Team: Spanish (http://www.transifex.com/geonode/geonode/language/"
@@ -79,3 +79,9 @@ msgstr "Listar captaciones"
 
 #~ msgid "List Water Intake"
 #~ msgstr "Listar captaciones"
+
+#~ msgid "portfolios intro"
+#~ msgstr "Seleccione los objetivos para los cuales el sistema generará portafolios de Soluciones Basadas en la Naturaleza, utilizando el marco técnico de RIOS"
+
+#~ msgid "portfolios objectives"
+#~ msgstr "portfolios objectives"

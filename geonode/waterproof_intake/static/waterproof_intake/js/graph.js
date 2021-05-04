@@ -16,6 +16,7 @@ var connection = [];
 var funcostdb = [];
 var bandera = true;
 var banderaValideGraph = 1;
+var banderaFunctionCost = false;
 // Program starts here. The document.onLoad executes the
 // createEditor function with a given configuration.
 // In the config file, the mxEditor.onInit method is
@@ -86,7 +87,7 @@ function onInit(editor) {
             var fontSize = style[mxConstants.STYLE_FONTSIZE] || mxConstants.DEFAULT_FONTSIZE;
         }
         if (label == undefined) {
-            label = "This connection doesn't have a defined type, \n please define a type";
+            label = gettext("This connection doesn't have a defined type, \n please define a type");
             if (typeof(cell.value) == "string" && cell.value.length > 0) {
                 try {
                     let obj = JSON.parse(cell.value);
@@ -166,15 +167,15 @@ function onInit(editor) {
             this.model.getValue(source) != null &&
             this.model.getValue(target) != null) {
             //water intake 
-            if (source.style != 'rio' && target.style == 'bocatoma') return 'The water intake element can only receive connection from the river element';
+            if (source.style != 'rio' && target.style == 'bocatoma') return gettext('The water intake element can only receive connection from the river element');
             //floating intake
             if (source.style != 'rio' && source.style != 'reservorioagua' && source.style != 'embalse' && target.style == 'bocatomaflotante')
-                return 'The floating intake element can only receive connection from the river, reservoir and water reservoir';
+                return gettext('The floating intake element can only receive connection from the river, reservoir and water reservoir');
             //side intake
             if (source.style != 'rio' && source.style != 'reservorioagua' && source.style != 'embalse' && target.style == 'bocatomalateral')
-                return 'The side intake element can only receive connection from the river, reservoir and water reservoir';
+                return gettext('The side intake element can only receive connection from the river, reservoir and water reservoir');
             //connection with itself
-            if (source.style == target.style) return 'No element could connect to itself';
+            if (source.style == target.style) return gettext('No element could connect to itself');
         }
         // "Supercall"
         return mxGraph.prototype.getEdgeValidationError.apply(this, arguments);
@@ -183,30 +184,30 @@ function onInit(editor) {
     // River not have a entrance connection
     editor.graph.multiplicities.push(new mxMultiplicity(
         false, 'Symbol', 'name', 'River', 0, 0, ['Symbol'],
-        `No element can be connected to the River`));
+        gettext(`No element can be connected to the River`)));
 
     // External input not have a entrance connection
     editor.graph.multiplicities.push(new mxMultiplicity(
         false, 'Symbol', 'name', 'External Input', 0, 0, ['Symbol'],
-        `No element can be connected to the External input`));
+        gettext(`No element can be connected to the External input`)));
 
     // External input needs 1 connected Targets
     editor.graph.multiplicities.push(new mxMultiplicity(
         true, 'Symbol', 'name', 'External Input', 0, 1, ['Symbol'],
-        'External Input only have 1 target',
-        'Source Must Connect to Target'));
+        gettext('External Input only have 1 target'),
+        gettext('Source Must Connect to Target')));
 
     // Source nodes needs 1 connected Targets
     editor.graph.multiplicities.push(new mxMultiplicity(
         true, 'Symbol', 'name', 'River', 0, 1, ['Symbol'],
-        'River only have 1 target',
-        'Source Must Connect to Target'));
+        gettext('River only have 1 target'),
+        gettext('Source Must Connect to Target')));
 
     // Target needs exactly one incoming connection from Source
     editor.graph.multiplicities.push(new mxMultiplicity(
         true, 'Symbol', 'name', 'CSINFRA', 0, 0, ['Symbol'],
-        `From element CSINFRA can't connect to other element`,
-        'Target Must Connect From Source'));
+        gettext("From element CSINFRA can't connect to other element"),
+        gettext('Target Must Connect From Source')));
 
     var getdata = document.getElementById('getdata');
     getdata.checked = false;
@@ -379,15 +380,165 @@ function onInit(editor) {
             handlers: {
                 edit: function() {
                     mathField.focus();
-                    //latexSpan.textContent = mathField.latex();
+
                 }
             }
+        });
+
+        //logical input logical
+        var MQL1 = MathQuill.getInterface(2);
+        var CostSelected = null;
+        var mathFieldSpanLog1 = document.getElementById('math-fieldlogic1');
+        var mathFieldlog1 = MQL1.MathField(mathFieldSpanLog1, {
+            spaceBehavesLikeTab: true,
+            autoCommands: 'pi theta sqrt sum mod',
+            autoOperatorNames: 'sin cos tan',
+            restrictMismatchedBrackets: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function() {
+                    mathFieldlog1.focus();
+
+                }
+            }
+        });
+
+        //logical input logical
+        var MQL2 = MathQuill.getInterface(2);
+        var CostSelected = null;
+        var mathFieldSpanLog2 = document.getElementById('math-fieldlogic2');
+        var mathFieldlog2 = MQL2.MathField(mathFieldSpanLog2, {
+            spaceBehavesLikeTab: true,
+            autoCommands: 'pi theta sqrt sum mod',
+            autoOperatorNames: 'sin cos tan',
+            restrictMismatchedBrackets: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function() {
+                    mathFieldlog2.focus();
+
+                }
+            }
+        });
+
+        //logical input logical
+        var MQL3 = MathQuill.getInterface(2);
+        var CostSelected = null;
+        var mathFieldSpanLog3 = document.getElementById('math-fieldlogic3');
+        var mathFieldlog3 = MQL3.MathField(mathFieldSpanLog3, {
+            spaceBehavesLikeTab: true,
+            autoCommands: 'pi theta sqrt sum mod',
+            autoOperatorNames: 'sin cos tan',
+            restrictMismatchedBrackets: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function() {
+                    mathFieldlog3.focus();
+
+                }
+            }
+        });
+
+        //logical input expresion
+        var MQE1 = MathQuill.getInterface(2);
+        var CostSelected = null;
+        var mathFieldSpanE1 = document.getElementById('math-fieldex1');
+
+        var mathFieldE1 = MQE1.MathField(mathFieldSpanE1, {
+            spaceBehavesLikeTab: true,
+            autoCommands: 'pi theta sqrt sum mod',
+            autoOperatorNames: 'sin cos tan',
+            restrictMismatchedBrackets: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function() {
+                    mathFieldE1.focus();
+                }
+            }
+        });
+
+        //logical input expresion
+        var MQE2 = MathQuill.getInterface(2);
+        var CostSelected = null;
+        var mathFieldSpanE2 = document.getElementById('math-fieldex2');
+
+        var mathFieldE2 = MQE2.MathField(mathFieldSpanE2, {
+            spaceBehavesLikeTab: true,
+            autoCommands: 'pi theta sqrt sum mod',
+            autoOperatorNames: 'sin cos tan',
+            restrictMismatchedBrackets: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function() {
+                    mathFieldE2.focus();
+                }
+            }
+        });
+
+        //logical input expresion
+        var MQE3 = MathQuill.getInterface(2);
+        var CostSelected = null;
+        var mathFieldSpanE3 = document.getElementById('math-fieldex3');
+
+        var mathFieldE3 = MQE3.MathField(mathFieldSpanE3, {
+            spaceBehavesLikeTab: true,
+            autoCommands: 'pi theta sqrt sum mod',
+            autoOperatorNames: 'sin cos tan',
+            restrictMismatchedBrackets: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function() {
+                    mathFieldE3.focus();
+                }
+            }
+        });
+
+        mathQuillSelected = 'mathField';
+
+        //KeyBoard calculator funcion cost
+        $('button[name=mathKeyBoard]').click(function() {
+            addInfo(mathQuillSelected, $(this).attr('value'));
         });
 
         $('button[name=mathKeyBoard]').each(function() {
             MQ.StaticMath(this);
         });
 
+        $('span[id^=math-fieldlogic').click(function() {
+            mathQuillSelected = $(this).attr('valinfo');
+        });
+
+        $('span[id^=math-fieldex').click(function() {
+            mathQuillSelected = $(this).attr('valinfo');
+        });
+
+        $('#math-field').click(function() {
+            mathQuillSelected = $(this).attr('valinfo');
+        });
+
+        $('#math-fieldPython').click(function() {
+            mathQuillSelected = false;
+        });
+
+        function clearInputsMath() {
+            mathField.latex('').blur();
+            mathFieldlog1.latex('').blur();
+            mathFieldlog2.latex('').blur();
+            mathFieldlog3.latex('').blur();
+            mathFieldE1.latex('').blur();
+            mathFieldE2.latex('').blur();
+            mathFieldE3.latex('').blur();
+            $('#math-fieldPython').val('');
+        }
+
+        $("#currencyCost").on("change", function() {
+            $.ajax({
+                url: `/parameters/load-currency/?currency=${$('#currencyCost').val()}`,
+                success: function(result) {
+                    $('#global_multiplier_factorCalculator').val(JSON.parse(result)[0].fields.global_multiplier_factor);
+                }
+            });
+        });
         //load data when add an object in a diagram
         editor.graph.addListener(mxEvent.ADD_CELLS, function(sender, evt) {
             var selectedCell = evt.getProperty("cells");
@@ -442,6 +593,7 @@ function onInit(editor) {
         $('#saveGraph').click(function() {
             validateGraphIntake();
         });
+
 
         function validateGraphIntake() {
 
@@ -505,19 +657,66 @@ function onInit(editor) {
 
         }
 
-        //Set var into calculator
-        $(document).on('click', '.list-group-item', function() {
-            addInfo(`\\mathit{${$(this).attr('value')}}`);
+        $('#step4NextBtn').click(function() {
+            var datop = false;
+            saveExternalData(datop);
         });
 
+        //Set var into calculator
+        $(document).on('click', '.list-group-item', function() {
+            mathQuillSelected ? addInfo(mathQuillSelected, `\\mathit{${$(this).attr('value')}}`) : addInfo(false, `${$(this).attr('value')}`);
+        });
 
         $('#saveAndValideCost').click(function() {
-            funcostdb[CostSelected].fields.function_value = mathField.latex();
+            if (banderaFunctionCost) {
+                //true = nueva
+                funcostdb.push({
+                    'fields': {
+                        'function_value': mathField.latex(),
+                        'function_py_value': $('#math-fieldPython').val(),
+                        'function_name': $('#costFunctionName').val() == '' ? 'Undefined name' : $('#costFunctionName').val(),
+                        'function_description': $('#costFuntionDescription').val(),
+                        'global_multiplier_factorCalculator': $('#global_multiplier_factorCalculator').val(),
+                        'currencyCost': $('#currencyCost').val(),
+                        'logical': [{
+                            'condition_1': mathFieldlog1.latex(),
+                            'ecuation_1': mathFieldE1.latex(),
+                            'condition_2': mathFieldlog2.latex(),
+                            'ecuation_2': mathFieldE2.latex(),
+                            'condition_3': mathFieldlog3.latex(),
+                            'ecuation_3': mathFieldE3.latex()
+                        }],
+                    }
+                });
+
+                funcostdb[funcostdb.length - 1].fields.logical = JSON.stringify(funcostdb[funcostdb.length - 1].fields.logical);
+            } else {
+                //false = editar
+                var temp = {
+                    'function_name': $('#costFunctionName').val() == '' ? 'Undefined name' : $('#costFunctionName').val(),
+                    'function_description': $('#costFuntionDescription').val(),
+                    'function_py_value': $('#math-fieldPython').val(),
+                    'global_multiplier_factorCalculator': $('#global_multiplier_factorCalculator').val(),
+                    'currencyCost': $('#currencyCost').find('option:selected').attr("name"),
+                    'logical': [{
+                        'condition_1': mathFieldlog1.latex(),
+                        'ecuation_1': mathFieldE1.latex(),
+                        'condition_2': mathFieldlog2.latex(),
+                        'ecuation_2': mathFieldE2.latex(),
+                        'condition_3': mathFieldlog3.latex(),
+                        'ecuation_3': mathFieldE3.latex()
+                    }],
+                }
+
+                temp.logical = JSON.stringify(temp.logical);
+                $.extend(funcostdb[CostSelected].fields, temp);
+                funcostdb[CostSelected].fields.function_value = mathField.latex();
+            }
             selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
-            $('#funcostgenerate div').remove();
+            $('#funcostgenerate tr').remove();
             $('#funcostgenerate').empty();
             for (let index = 0; index < funcostdb.length; index++) {
-                funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
+                funcost(index, MQ);
             }
             $('#CalculatorModal').modal('hide');
             validateGraphIntake();
@@ -526,60 +725,86 @@ function onInit(editor) {
         //Edit funcion cost 
         $(document).on('click', 'a[name=glyphicon-edit]', function() {
             mathField.clearSelection();
+            clearInputsMath();
             $('#CalculatorModal').modal('show');
             CostSelected = $(this).attr('idvalue');
+            $('#costFunctionName').val(funcostdb[CostSelected].fields.function_name);
+            $('#costFuntionDescription').val(funcostdb[CostSelected].fields.function_description);
+            $('#CalculatorModalLabel').text('Modify Cost - ' + $('#titleCostFunSmall').text())
             setVarCost();
+
+            let val_py = funcostdb[CostSelected].fields.function_py_value
+            let rem = ['Q', 'CSed', 'CN', 'CP', 'WSed', 'WN', 'WP', 'WSedRet', 'WNRet', 'WPRet']
+            for (const it of rem) {
+                val_py = val_py.replaceAll(it, `${it}${$('#titleCostFunSmall').attr('valueid')}`)
+            }
+            $('#math-fieldPython').val(val_py);
             let value = funcostdb[CostSelected].fields.function_value;
-            mathField.latex(value);
-            mathField.focus();
+            mathField.latex(value).blur();
+            if (funcostdb[CostSelected].fields.logical != undefined) {
+                let logicalcost = JSON.parse(funcostdb[CostSelected].fields.logical);
+                mathFieldlog1.latex(logicalcost[0].condition_1).blur();
+                mathFieldlog2.latex(logicalcost[0].condition_2).blur();
+                mathFieldlog3.latex(logicalcost[0].condition_3).blur();
+                mathFieldE1.latex(logicalcost[0].ecuation_1).blur();
+                mathFieldE2.latex(logicalcost[0].ecuation_2).blur();
+                mathFieldE3.latex(logicalcost[0].ecuation_3).blur();
+            }
+
         });
 
         //Delete funcion cost 
         $(document).on('click', 'a[name=glyphicon-trash]', function() {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: gettext('Are you sure?'),
+                text: gettext("You won't be able to revert this!"),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: gettext('Yes, delete it!')
             }).then((result) => {
                 if (result.isConfirmed) {
                     var id = $(this).attr('idvalue');
-                    $(`#funcostgenerate div[idvalue = 'fun_${id}']`).remove();
+                    $(`#funcostgenerate tr[idvalue = 'fun_${id}']`).remove();
                     if (typeof(selectedCell.value) == "string" && selectedCell.value.length > 0) {
                         var obj = JSON.parse(selectedCell.value);
                         let dbfields = JSON.parse(obj.funcost);
                         dbfields.splice(id, 1);
                         obj.funcost = JSON.stringify(dbfields);
                         selectedCell.setValue(JSON.stringify(obj));
-                        $('#funcostgenerate div').remove();
+                        $('#funcostgenerate tr').remove();
                         $('#funcostgenerate').empty();
                         for (let index = 0; index < funcostdb.length; index++) {
-                            funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
+                            funcost(index, MQ);
                         }
 
                     } else {
                         funcostdb.splice(id, 1);
                         selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
-                        $('#funcostgenerate div').remove();
+                        $('#funcostgenerate tr').remove();
                         $('#funcostgenerate').empty();
                         for (let index = 0; index < funcostdb.length; index++) {
-                            funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
+                            funcost(index, MQ);
                         }
                     }
 
                     Swal.fire(
-                        'Deleted!',
-                        'Your funcion has been deleted.',
+                        gettext('Deleted!'),
+                        gettext('Your funcion has been deleted'),
                         'success'
                     )
                 }
             })
         });
 
+        $(document).on('click', 'a[name=fun_display_btn]', function() {
+            var idx = $(this).attr('idvalue');
+            $(`#fun_display_${idx}`).toggle();
+        });
+
         function setVarCost() {
+            banderaFunctionCost = false;
             $('#VarCostListGroup div').remove();
             $('#VarCostListGroup').empty();
             for (const index of graphData) {
@@ -591,7 +816,7 @@ function onInit(editor) {
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#VarCostListGroup" href="#VarCostListGroup_${index.id}">${index.id} - ${index.name}</a>
+                                <a data-toggle="collapse" data-parent="#VarCostListGroup" href="#VarCostListGroup_${index.id}">${index.id} - ${index.name.replace(/['"]+/g, '')}</a>
                             </h4>
                         </div>
                         <div id="VarCostListGroup_${index.id}" class="panel-collapse collapse">
@@ -603,8 +828,13 @@ function onInit(editor) {
         }
 
         $('#ModalAddCostBtn').click(function() {
+            banderaFunctionCost = true;
             $('#VarCostListGroup div').remove();
             $('#VarCostListGroup').empty();
+            clearInputsMath();
+            $('#costFunctionName').val('');
+            $('#costFuntionDescription').val('');
+            $('#CalculatorModalLabel').text('New Function Cost - ' + $('#titleCostFunSmall').text())
             for (const index of graphData) {
                 var costlabel = "";
                 for (const iterator of JSON.parse(index.varcost)) {
@@ -614,7 +844,7 @@ function onInit(editor) {
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#VarCostListGroup" href="#VarCostListGroup_${index.id}">${index.id} - ${index.name}</a>
+                            <a data-toggle="collapse" data-parent="#VarCostListGroup" href="#VarCostListGroup_${index.id}">${index.id} - ${index.name.replace(/['"]+/g, '')}</a>
                         </h4>
                     </div>
                     <div id="VarCostListGroup_${index.id}" class="panel-collapse collapse">
@@ -625,10 +855,7 @@ function onInit(editor) {
             }
         });
 
-        //KeyBoard calculator funcion cost
-        $('button[name=mathKeyBoard]').click(function() {
-            addInfo($(this).attr('value'));
-        });
+
 
         //Add value entered in sediments in the field resultdb
         $('#sedimentosDiagram').change(function() {
@@ -688,6 +915,60 @@ function onInit(editor) {
             validationTransportedWater(editor, selectedCell);
         });
 
+        // Save External Input Data
+        function saveExternalData(date) {
+            for (let id = 0; id < graphData.length; id++) {
+                if (graphData[id].external) {
+                    graphData[id].externaldata = [];
+                    $(`th[name=year_${graphData[id].id}]`).each(function() {
+                        let watersita = $(`input[name="waterVolume_${$(this).attr('year_value')}_${graphData[id].id}"]`).val();
+                        let sedimentsito = $(`input[name="sediment_${$(this).attr('year_value')}_${graphData[id].id}"]`).val();
+                        let nitrogenito = $(`input[name="nitrogen_${$(this).attr('year_value')}_${graphData[id].id}"]`).val();
+                        let phospharusito = $(`input[name="phosphorus_${$(this).attr('year_value')}_${graphData[id].id}"]`).val();
+                        if (watersita == '' || sedimentsito == '' || nitrogenito == '' || phospharusito == '') {
+                            date = true;
+                            Swal.fire({
+                                icon: 'warning',
+                                title: gettext('Field empty'),
+                                text: gettext('Please fill every fields')
+                            });
+                            return;
+                        } else {
+                            graphData[id].externaldata.push({
+                                "year": $(this).attr('year_value'),
+                                "waterVol": watersita,
+                                "sediment": sedimentsito,
+                                "nitrogen": nitrogenito,
+                                "phosphorus": phospharusito
+                            });
+                        }
+                    });
+                    var enc = new mxCodec();
+                    var node = enc.encode(editor.graph.getModel());
+                    node.querySelectorAll('Symbol').forEach((params) => {
+                        if (params.getAttribute('externalData') === 'true') {
+                            if (params.id === graphData[id].id) {
+                                params.setAttribute('external', JSON.stringify(graphData[id].externaldata))
+                                textxml = mxUtils.getPrettyXml(node);
+                                xmlDoc = mxUtils.parseXml(textxml)
+                                var dec = new mxCodec(xmlDoc);
+                                dec.decode(xmlDoc.documentElement, editor.graph.getModel());
+                                textxml = mxUtils.getPrettyXml(node);
+                            }
+                        }
+                    });
+
+                    graphData[id].externaldata = JSON.stringify(graphData[id].externaldata);
+                }
+
+            }
+            $('#xmlGraph').val(textxml);
+            $('#graphElements').val(JSON.stringify(graphData));
+            if (!date) {
+                intakeStepFour();
+            }
+        }
+
 
 
         jQuery.fn.ForceNumericOnly = function() {
@@ -709,11 +990,51 @@ function onInit(editor) {
         };
         //Force only numbers into calculator funcion cost
         $("#math-field").ForceNumericOnly();
+        $("#math-fieldlogic1").ForceNumericOnly();
+        $("#math-fieldlogic2").ForceNumericOnly();
+        $("#math-fieldlogic3").ForceNumericOnly();
+        $("#math-fieldex1").ForceNumericOnly();
+        $("#math-fieldex2").ForceNumericOnly();
+        $("#math-fieldex3").ForceNumericOnly();
+
+
         //Append values and var into funcion cost
-        function addInfo(value) {
-            mathField.cmd(value);
-            mathField.focus();
+        function addInfo(type, value) {
+            if (type) {
+                if (type == 'mathField') {
+                    mathField.cmd(value);
+                    mathField.focus();
+                }
+                if (type == 'mathFieldlog1') {
+                    mathFieldlog1.cmd(value);
+                    mathFieldlog1.focus();
+                }
+                if (type == 'mathFieldlog2') {
+                    mathFieldlog2.cmd(value);
+                    mathFieldlog2.focus();
+                }
+                if (type == 'mathFieldlog3') {
+                    mathFieldlog3.cmd(value);
+                    mathFieldlog3.focus();
+                }
+                if (type == 'mathFieldE1') {
+                    mathFieldE1.cmd(value);
+                    mathFieldE1.focus();
+                }
+                if (type == 'mathFieldE2') {
+                    mathFieldE2.cmd(value);
+                    mathFieldE2.focus();
+                }
+                if (type == 'mathFieldE3') {
+                    mathFieldE3.cmd(value);
+                    mathFieldE3.focus();
+                }
+            } else {
+                $('#math-fieldPython').val($('#math-fieldPython').val() + value);
+            }
+
         }
+
 
     });
 
