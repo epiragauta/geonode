@@ -2129,11 +2129,11 @@ msgid ""
 msgstr ""
 
 #: geonode/frequently/templates/frequently/entry_list.html:5
-#: geonode/templates/base.html:655
+#: geonode/templates/base.html:542
 #: geonode/templates/frequently/entry_list.html:6
 #: geonode/templates/frequently/entry_list.html:9
 msgid "FAQ"
-msgstr "FAQ"
+msgstr ""
 
 #: geonode/frequently/templates/frequently/entry_list.html:6
 #: geonode/frequently/templates/frequently/plugin.html:2
@@ -7596,29 +7596,29 @@ msgstr ""
 msgid "Read More"
 msgstr ""
 
-#: geonode/templates/base.html:654
+#: geonode/templates/base.html:541
 #, fuzzy
 #| msgid "About GeoNode."
 msgid "About Waterproof"
-msgstr "About Waterproof"
+msgstr "About GeoNode."
 
-#: geonode/templates/base.html:656
+#: geonode/templates/base.html:543
 msgid "Terms and conditions"
-msgstr "Terms and conditions"
+msgstr ""
 
-#: geonode/templates/base.html:657
+#: geonode/templates/base.html:544
 #, fuzzy
 #| msgid "Privacy &#038; Cookies Policy"
 msgid "Privacy policy"
-msgstr "Privacy policy"
+msgstr "Privacy &#038; Cookies Policy"
 
-#: geonode/templates/base.html:658 geonode/templates/collaborators.html:14
+#: geonode/templates/base.html:545 geonode/templates/collaborators.html:14
 msgid "Collaborators"
-msgstr "Collaborators"
+msgstr ""
 
-#: geonode/templates/base.html:659
+#: geonode/templates/base.html:546
 msgid "Water funds toolbox"
-msgstr "Water funds toolbox"
+msgstr ""
 
 #: geonode/templates/base.html:563
 msgid "Contact Us"
@@ -8143,45 +8143,45 @@ msgstr "Search for Data."
 msgid "Advanced Search"
 msgstr "Advanced Search"
 
-#: geonode/templates/index.html:131
-msgid "System Operating Instructions"
-msgstr "System Operating Instructions"
+#: geonode/templates/index.html:130
+msgid "System operating instructions"
+msgstr ""
 
-#: geonode/templates/index.html:138 geonode/templates/index.html:175
+#: geonode/templates/index.html:137 geonode/templates/index.html:175
 #, fuzzy
 #| msgid "Click the button below to generate a new map based on this layer."
-msgid "Choose or create a new NbS"
-msgstr "Choose or create a new NbS"
+msgid "Choose or create a new NBS"
+msgstr "Click the button below to generate a new map based on this layer."
 
-#: geonode/templates/index.html:140 geonode/templates/index.html:185
+#: geonode/templates/index.html:139 geonode/templates/index.html:185
 msgid "Define and configure your Water Intakes"
-msgstr "Define and configure your Water Intakes"
+msgstr ""
 
-#: geonode/templates/index.html:142 geonode/templates/index.html:195
+#: geonode/templates/index.html:141 geonode/templates/index.html:195
 msgid "Locate your city"
-msgstr "Locate your city"
+msgstr ""
 
-#: geonode/templates/index.html:154 geonode/templates/index.html:205
+#: geonode/templates/index.html:153 geonode/templates/index.html:205
 msgid "Configure your treatment plants or customized infrastructure"
-msgstr "Configure your treatment plants or customized infraestructure"
+msgstr ""
 
-#: geonode/templates/index.html:156 geonode/templates/index.html:215
+#: geonode/templates/index.html:155 geonode/templates/index.html:215
 msgid "Define costs and create your case study"
-msgstr "Define costs and create your case study"
+msgstr ""
 
-#: geonode/templates/index.html:158 geonode/templates/index.html:225
-msgid "Consult, compare, download and share the results"
-msgstr "Consult, compare, download and share the results"
+#: geonode/templates/index.html:157 geonode/templates/index.html:225
+msgid "Consult Compare. download and share the results"
+msgstr ""
 
 #: geonode/templates/index.html:233
 #, fuzzy
 #| msgid "Spatial Resolution"
-msgid "Nature based Solutions"
-msgstr "Nature based Solutions"
+msgid "Nature-based solutions"
+msgstr "Spatial Resolution"
 
-#: geonode/templates/index.html:236
-msgid "NbS can be categorized in four major interventions"
-msgstr "NbS can be categorized in four major interventions"
+#: geonode/templates/index.html:234
+msgid "We work to meet this ambitious goal"
+msgstr ""
 
 #: geonode/templates/index.html:240
 #, fuzzy
@@ -8207,25 +8207,9 @@ msgstr ""
 msgid "Sustainable production systems"
 msgstr ""
 
-#: geonode/templates/index.html:242
-msgid "Protection"
-msgstr "Protection"
-
-#: geonode/templates/index.html:248
-msgid "Restoration"
-msgstr "Restoration"
-
-#: geonode/templates/index.html:254
-msgid "Creation"
-msgstr "Creation"
-
-#: geonode/templates/index.html:260
-msgid "Management"
-msgstr "Management"
-
-#: geonode/templates/index.html:268
-msgid "Did you know?"
-msgstr "¿Sabía qué?"
+#: geonode/templates/index.html:274
+msgid "News"
+msgstr ""
 
 #: geonode/templates/index.html:282
 msgid "Indicators of water risk and basin healths"
@@ -8290,21 +8274,21 @@ msgstr ""
 msgid "WATERPROOF WIKI"
 msgstr ""
 
-#: geonode/templates/index.html:322
+#: geonode/templates/index.html:328
 msgid "Knowledge bank"
-msgstr "Knowledge bank"
+msgstr ""
 
-#: geonode/templates/index.html:325
+#: geonode/templates/index.html:331
 msgid "Check here the conceptual elements that Waterproof uses to propose"
-msgstr "Check here the conceptual elements that Waterproof uses to propose"
+msgstr ""
 
-#: geonode/templates/index.html:326
-msgid "Nature based Solutions and calculate the return on your investment"
-msgstr "Nature based Solutions and calculate the return on your investment"
+#: geonode/templates/index.html:332
+msgid "nature-based solutions and calculate the return on your investment"
+msgstr ""
 
-#: geonode/templates/index.html:334
+#: geonode/templates/index.html:340
 msgid "Keep reading"
-msgstr "Keep reading"
+msgstr ""
 
 #: geonode/templates/index.html:382
 msgid ""
@@ -11979,43 +11963,3 @@ msgstr "Permission Denied"
 
 #~ msgid "you"
 #~ msgstr "you"
-
-#: geonode/templates/menu.html:303
-msgid "About us"
-msgstr "About us"
-
-#: geonode/templates/menu.html:311
-msgid "Take Action"
-msgstr "Take Action"
-
-#: geonode/templates/menu.html:491
-msgid "Nature-based solutions"
-msgstr "Nature based Solutions"
-
-#: geonode/templates/menu.html:495
-msgid "List"
-msgstr "View"
-
-#: geonode/templates/menu.html:500
-msgid "Create"
-msgstr "New"
-
-#: geonode/templates/menu.html:507
-msgid "Intakes"
-msgstr "Water intakes"
-
-#: geonode/templates/menu.html:525
-msgid "Treatment plants"
-msgstr "Treatment plants (DWTP)"
-
-#: geonode/templates/menu.html:541
-msgid "Study cases"
-msgstr "Study cases"
-
-#: geonode/templates/menu.html:569
-msgid "Historical"
-msgstr "My records"
-
-#: geonode/templates/menu.html:575
-msgid "Databases"
-msgstr "Databases"
