@@ -1,0 +1,6 @@
+[submodule "ModelosWFAPP"]
+	path = ModelosWFAPP
+	url = http://edwin.piragauta@dev.skaphe.com:8181/r/TNC/ModelosWFAPP.git
+[submodule "ModelosRIOS"]
+	path = ModelosRIOS
+	url = http://nres-w@dev.skaphe.com:8181/r/TNC/ModelosRIOS.git
