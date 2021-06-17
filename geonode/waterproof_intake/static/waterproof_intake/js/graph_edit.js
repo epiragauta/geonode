@@ -614,6 +614,7 @@ function onInit(editor) {
                     'function_py_value': $('#python-expression').val(),
                     'global_multiplier_factorCalculator': $('#global_multiplier_factorCalculator').val(),
                     'currencyCost': $('#currencyCost option:selected').val(),
+                    'currencyCostName': $('#currencyCost option:selected').text(),
                     'logical': [{
                         'condition_1': "", /* mathFieldlog1.latex(), */
                         'ecuation_1': "", /* mathFieldE1.latex(), */
