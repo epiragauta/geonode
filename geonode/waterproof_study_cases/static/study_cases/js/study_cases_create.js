@@ -98,18 +98,6 @@ $(document).ready(function() {
         $('#custom-required').text("");
     });
 
-    $('#btn-full').click(function() {
-        if ($("#full-table").hasClass("panel-hide")) {
-            $("#full-table").removeClass("panel-hide");
-            $("#full-table").find("input").each(function() {
-                var $this = $(this).val('');
-            });
-            $('#autoAdjustHeightF').css("height", "auto");
-            $('#column_investment').text("Percentage");
-        } else {
-            $("#full-table").addClass("panel-hide");
-        }
-    });
 
     $('#btn-advanced_option').click(function() {
         if ($("#biophysical-panel").hasClass("panel-hide")) {
@@ -123,18 +111,48 @@ $(document).ready(function() {
     });
 
 
+    $('#btn-full').click(function() {
+        if ($("#full-table").hasClass("panel-hide")) {
+            $("#full-table").removeClass("panel-hide");
+            nbsactivities = $("#full-table").find("input")
+            nbsactivities.each(function() {
+                total = 50
+                if (total) {
+                    value = total / nbsactivities.length
+                    value = Number.parseFloat(value).toFixed(2);
+                    var $this = $(this).val(value);
+                } else {
+                    var $this = $(this).val('');
+                }
+            });
+            $('#autoAdjustHeightF').css("height", "auto");
+            $('#column_investment').text("Percentage");
+        } else {
+            $("#full-table").addClass("panel-hide");
+        }
+    });
+
     $('#btn-investment').click(function() {
         if ($("#full-table").hasClass("panel-hide")) {
             $("#full-table").removeClass("panel-hide");
             $('#autoAdjustHeightF').css("height", "auto");
             $('#column_investment').text("Investment");
-            $("#full-table").find("input").each(function() {
-                var $this = $(this).val('');
+            nbsactivities = $("#full-table").find("input")
+            nbsactivities.each(function() {
+                total = $('#annual_investment').val() / 2
+                if (total) {
+                    value = total / nbsactivities.length
+                    value = Number.parseFloat(value).toFixed(2);
+                    var $this = $(this).val(value);
+                } else {
+                    var $this = $(this).val('');
+                }
             });
         } else {
             $("#full-table").addClass("panel-hide");
         }
     });
+
 
     $('#full').click(function() {
         $("#panel-full").removeClass("panel-hide");
@@ -200,6 +218,14 @@ $(document).ready(function() {
         valid_ptaps = true;
         valid_intakes = true;
         var type = $("input[name='type']:checked").val();
+        $('#custom_table').find('tbody > tr').each(function(index, tr) {
+            id = tr.id.replace('custom-', '')
+            intakes.push(id)
+        });
+        if (intakes.length <= 0) {
+            valid_intakes = false
+        }
+        var type = $("input[name='type']:checked").val();
         if (type == "1") {
             $('#ptap_table').find('tbody > tr').each(function(index, tr) {
                 id = tr.id.replace('ptap-', '')
@@ -210,14 +236,6 @@ $(document).ready(function() {
             } else {
                 valid_intakes = true
             }
-        } else {
-            $('#custom_table').find('tbody > tr').each(function(index, tr) {
-                id = tr.id.replace('custom-', '')
-                intakes.push(id)
-            });
-            if (intakes.length <= 0) {
-                valid_intakes = false
-            }
         }
 
         if (($('#name').val() != '' && $('#description').val() != '' && valid_intakes && valid_ptaps)) {
@@ -225,7 +243,7 @@ $(document).ready(function() {
                 name: $('#name').val(),
                 id_study_case: id_study_case,
                 description: $('#description').val(),
-                city: localStorage.city,
+                city_id: localStorage.cityId,
                 country: localStorage.country,
                 intakes: intakes,
                 ptaps: ptaps,
@@ -242,6 +260,7 @@ $(document).ready(function() {
                 } else {
                     $('#smartwizard').smartWizard("next");
                     $('#autoAdjustHeightF').css("height", "auto");
+                    loadCarbomMarketParameter();
                     $("#cm_form").hide();
                 }
 
@@ -313,7 +332,6 @@ $(document).ready(function() {
     });
 
     $('#step4PreviousBtn').click(function() {
-        $("#biophysical-panel").empty();
         $('#smartwizard').smartWizard("prev");
     });
 
@@ -442,8 +460,6 @@ $(document).ready(function() {
                 id_study_case: id_study_case,
                 nbs: nbs
             }, function(data) {
-                $('#smartwizard').smartWizard("next");
-                $('#autoAdjustHeightF').css("height", "auto");
                 loadNBSActivities();
             }, "json");
         } else {
@@ -493,7 +509,9 @@ $(document).ready(function() {
 
             analysis_currency = $("#analysis_currency option:selected").text()
             html = '<div class="row" id="currencys-panel"> <div class="col-md-10 currency-panel">Currency for the execution this analisys</div><div class="col-md-2 currency-panel currency-text">' + analysis_currency
-            html += '</div><div class="col-md-12 currency-panel">Next, the exchange rate will be applied to the currencies identifed in the cost functions configured for this analysis ins described.</div>'
+            html += '</div><div class="col-md-12 currency-panel">The following exchange rates will be applied for the analysis.</div>'
+            html += '<div class="custom-control col-md-4 currency-value">Currency</div>'
+            html += '<div class="custom-control col-md-8 currency-value">Exchange</div>'
             $.get("../../study_cases/currencys/", {
                 id: id_study_case,
                 currency: analysis_currency
@@ -501,8 +519,8 @@ $(document).ready(function() {
                 $.each(data, function(index, currency) {
                     if (currency.currency != analysis_currency) {
                         value = Number.parseFloat(currency.value).toFixed(5);
-                        html += '<div class="col-md-2 currency-value"><label class="custom-control-label" for="currency">' + currency.currency + '</label></div>'
-                        html += '<div class="custom-control col-md-10 currency-value"><input id="' + currency.currency + '" class="text-number" type="number" class="custom-control-input" value="' + value + '"></div>'
+                        html += '<div class="col-md-4 currency-value"><label class="custom-control-label" for="currency">' + currency.currency + '</label></div>'
+                        html += '<div class="custom-control col-md-8 currency-value"><input id="' + currency.currency + '" class="text-number" type="number" class="custom-control-input" value="' + value + '"></div>'
                     }
                 });
                 Swal.fire({
@@ -549,11 +567,12 @@ $(document).ready(function() {
                             rellocated_remainder: $("#rellocated_check").is(':checked'),
                             nbsactivities: '1' + JSON.stringify(nbsactivities),
                             currencys: '1' + JSON.stringify(result.value),
+                            run_analysis: false
                         }, function(data) {
                             $('#smartwizard').smartWizard("next");
                             $('#autoAdjustHeightF').css("height", "auto");
+                            $("#form").submit();
                         }, "json");
-                        $("#form").submit();
                     }
                 })
             });
@@ -571,46 +590,120 @@ $(document).ready(function() {
 
 
     $('#step7RunBtn').click(function() {
-        analysis_currency = $("#analysis_currency option:selected").text()
-        html = '<div class="row" id="currencys-panel"> <div class="col-md-10 currency-panel">Currency for the execution this analisys</div><div class="col-md-2 currency-panel currency-text">' + analysis_currency
-        html += '</div><div class="col-md-12 currency-panel">Next, the exchange rate will be applied to the currencies identifed in the cost functions configured for this analysis ins described.</div>'
-        $.get("../../study_cases/currencys/", {
-            id: id_study_case,
-            currency: analysis_currency
-        }, function(data) {
-            $.each(data, function(index, currency) {
-                if (currency.currency != analysis_currency) {
-                    value = Number.parseFloat(currency.value).toFixed(5);
-                    html += '<div class="col-md-2 currency-value"><label class="custom-control-label" for="currency">' + currency.currency + '</label></div>'
-                    html += '<div class="custom-control col-md-10 currency-value"><input id="' + currency.currency + '" class="text-number" type="number" class="custom-control-input" value="' + value + '"></div>'
+        edit = !$("#full-table").hasClass("panel-hide")
+        var valid_edit = true;
+        var valid_investment = true;
+        var valid_period = true;
+        nbsactivities = []
+        if (edit) {
+            var valid_edit = true;
+            $("#full-table").find("input").each(function() {
+                var $this = $(this);
+                if ($this.val().length <= 0) {
+                    valid_edit = false;
+                    return false;
                 }
             });
+        }
+        if ($('#period_analysis').val() < 10 || $('#period_analysis').val() > 100) {
             Swal.fire({
-                title: 'Exchange rate',
-                html: html,
-                showCancelButton: true,
-                confirmButtonText: 'Run',
-                preConfirm: () => {
-                    currencys = []
-                    $("#currencys-panel").find("input").each(function(index, input) {
-                        currency = {}
-                        input_id = input.id
-                        if (input_id) {
-                            val = $("#" + input_id).val()
-                            currency['currency'] = input_id;
-                            currency['value'] = val;
-                            currencys.push(currency)
-                        }
-                    });
-                    return currencys
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
+                icon: 'warning',
+                title: `Field problem`,
+                text: `Please check period value`
+            });
+            valid_period = false;
+            return
+        }
+        var type = $("input[name='analysis_type']:checked").val();
+        if (type == "2") {
+            valid_investment = $('#annual_investment').val() != ''
+        }
+        if ($('#period_analysis').val() != '' && $('#period_nbs').val() != '' && type && valid_edit && valid_investment && valid_period) {
 
-                }
-            })
-        });
+            analysis_currency = $("#analysis_currency option:selected").text()
+            html = '<div class="row" id="currencys-panel"> <div class="col-md-10 currency-panel">Currency for the execution this analisys</div><div class="col-md-2 currency-panel currency-text">' + analysis_currency
+            html += '</div><div class="col-md-12 currency-panel">The following exchange rates will be applied for the analysis.</div>'
+            html += '<div class="custom-control col-md-4 currency-value">Currency</div>'
+            html += '<div class="custom-control col-md-8 currency-value">Exchange</div>'
+            $.get("../../study_cases/currencys/", {
+                id: id_study_case,
+                currency: analysis_currency
+            }, function(data) {
+                $.each(data, function(index, currency) {
+                    if (currency.currency != analysis_currency) {
+                        value = Number.parseFloat(currency.value).toFixed(5);
+                        html += '<div class="col-md-4 currency-value"><label class="custom-control-label" for="currency">' + currency.currency + '</label></div>'
+                        html += '<div class="custom-control col-md-8 currency-value"><input id="' + currency.currency + '" class="text-number" type="number" class="custom-control-input" value="' + value + '"></div>'
+                    }
+                });
+                Swal.fire({
+                    title: 'Exchange rate',
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save',
+                    preConfirm: () => {
+                        currencys = []
+                        $("#currencys-panel").find("input").each(function(index, input) {
+                            currency = {}
+                            input_id = input.id
+                            if (input_id) {
+                                val = $("#" + input_id).val()
+                                currency['currency'] = input_id;
+                                currency['value'] = val;
+                                currencys.push(currency)
+                            }
+                        });
+                        return currencys
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#_analysis_processing').modal('toggle');
+                        $("#full-table").find("input").each(function(index, input) {
+                            nbsactivity = {}
+                            input_id = input.id
+                            if (input_id) {
+                                split = input_id.split('-')
+                                nbssc_id = split.pop();
+                                val = $("#" + input_id).val()
+                                nbsactivity['id'] = nbssc_id;
+                                nbsactivity['value'] = val;
+                                nbsactivities.push(nbsactivity)
+                            }
+                        });
+
+                        $.post("../../study_cases/save/", {
+                            id_study_case: id_study_case,
+                            analysis_type: type,
+                            period_nbs: $('#period_nbs').val(),
+                            period_analysis: $('#period_analysis').val(),
+                            analysis_nbs: $("#analysis_nbs option:selected").val(),
+                            analysis_currency: $("#analysis_currency option:selected").text(),
+                            annual_investment: $('#annual_investment').val(),
+                            rellocated_remainder: $("#rellocated_check").is(':checked'),
+                            nbsactivities: '1' + JSON.stringify(nbsactivities),
+                            currencys: '1' + JSON.stringify(result.value),
+                            run_analysis: true
+                        }, function(data) {
+                            $('#_analysis_processing').modal('hide');
+                            $('#smartwizard').smartWizard("next");
+                            $('#autoAdjustHeightF').css("height", "auto");
+                            $("#form").submit();
+                        }, "json");
+                    }
+                })
+            });
+
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: `Field empty`,
+                text: `Please check options`
+            });
+            return;
+        }
+
     });
+
 
 
     $('#custom_table').on('click', 'a', function() {
@@ -729,6 +822,15 @@ $(document).ready(function() {
         });
     }
 
+    function loadCarbomMarketParameter() {
+        $.get("../../study_cases/parametersbycountry/" + localStorage.country, function(data) {
+            $.each(data, function(index, financialParameters) {
+                if (!$("#id_cm").val())
+                    $("#id_cm").val(financialParameters.market_carbon_precing_USD_TonCO2e);
+            });
+        });
+    }
+
 
     function calculate_Personnel() {
         var total = 0.0;
@@ -823,8 +925,8 @@ $(document).ready(function() {
     }
 
     function loadIntakes() {
-        var city = localStorage.city
-        $.get("../../study_cases/intakebycity/" + city, function(data) {
+        var city_id = localStorage.cityId
+        $.get("../../study_cases/intakebycity/" + city_id, function(data) {
             if (data.length > 0) {
                 $.each(data, function(index, intake) {
                     var name = intake.name;
@@ -867,51 +969,94 @@ $(document).ready(function() {
         $.post("../../study_cases/nbs/", {
             id_study_case: id_study_case,
             country: country,
-            process: "View"
+            process: "Edit"
         }, function(data) {
             content = ''
+            value = ''
+            var type = $("input[name='analysis_type']:checked").val();
+            var total = 50
+            if (type == "2") {
+                total = $('#annual_investment').val() / 2
+            }
+            if (total) {
+                value = total / nbs.length
+                value = Number.parseFloat(value).toFixed(2);
+            }
+            values = false
             $.each(data, function(index, nbs) {
                 var name = nbs.name;
                 var id = nbs.id_nbssc
                 var def = nbs.default
+                var val = nbs.value;
+                if (val) {
+                    values = true
+                } else {
+                    val = value
+                }
                 if (def) {
-                    content += '<tr><td>' + name + '</td>'
-                    content += '<td><input class="text-number" type="number" id=nbssc-' + id + '></td></tr>'
+
+                    if ($('#nbssc-' + id).length <= 0) {
+                        content += '<tr><td>' + name + '</td>'
+                        content += '<td><input class="text-number" type="number" id="nbssc-' + id + '" value="' + val + '"> </td></tr > '
+                    }
                 }
             });
             $("#full-table").find('tbody').append(content);
             $('#full-table tbody tr td input').on('keyup', function(e) {
                 calculateAnalysisValues($(this))
             });
+            if (values) {
+                $("#full-table").removeClass('panel-hide');
+            }
+            $('#smartwizard').smartWizard("next");
             $('#autoAdjustHeightF').css("height", "auto");
-
         });
     }
 
 
     function loadBiophysicals() {
+        promises = []
         if (ptaps.length > 0) {
             $.each(ptaps, function(index, id_ptap) {
-                $.get("../../study_cases/intakebyptap/" + id_ptap, function(data) {
-                    $.each(data, function(index, intake) {
-                        loadBiophysical(intake.csinfra_elementsystem__intake__id, intake.csinfra_elementsystem__intake__name)
-                    });
-                });
+                promise = $.get("../../study_cases/intakebyptap/" + id_ptap);
+                promises.push(promise)
+
             });
 
         }
         if (intakes.length > 0) {
             $.each(intakes, function(index, id_intake) {
-                $.get("../../study_cases/intakebyid/" + id_intake, function(data) {
-                    intake = data[0];
-                    loadBiophysical(intake.id, intake.name)
+                promise = $.get("../../study_cases/intakebyid/" + id_intake);
+                promises.push(promise)
+            });
+        }
+        Promise.all(promises).then(values => {
+            promisesIntake = []
+            $.each(values, function(i, data) {
+                $.each(data, function(j, intake) {
+                    if (intake.csinfra_elementsystem__intake__id)
+                        promise = loadBiophysical(intake.csinfra_elementsystem__intake__id, intake.csinfra_elementsystem__intake__name);
+                    else
+                        promise = loadBiophysical(intake.id, intake.name)
+                    promisesIntake.push(promise)
                 });
             });
 
-        }
+            Promise.all(promisesIntake).then(valuesIntake => {
+                $.each(valuesIntake, function(i, content) {
+                    $("#biophysical-panel").append(content);
+                    $('#autoAdjustHeightF').css("height", "auto");
+                });
+            });
+
+        });
+
     }
 
+
+
     function loadBiophysical(id_intake, name) {
+        var deferred = $.Deferred();
         $.post("../../study_cases/bio/", {
             id_intake: id_intake,
             id_study_case: id_study_case,
@@ -928,7 +1073,11 @@ $(document).ready(function() {
             });
             content += '</tr></thead><tbody>'
             $.each(data, function(index, bio) {
-                content += '<tr id="' + id_intake + '_' + bio.id + '">'
+                if (bio.edit) {
+                    content += '<tr class="edit" id="' + id_intake + '_' + bio.id + '">'
+                } else {
+                    content += '<tr id="' + id_intake + '_' + bio.id + '">'
+                }
                 content += '<td id="description_' + id_intake + '_' + bio.id + '">' + bio.description + '</td>'
                 content += '<td id="lucode_' + id_intake + '_' + bio.id + '">' + bio.lucode + '</td>'
                 $.each(bio, function(key, v) {
@@ -939,19 +1088,14 @@ $(document).ready(function() {
                 content += '</tr>'
             });
             content += '</tbody></table></div>'
-            $("#biophysical-panel").append(content);
-            $('#autoAdjustHeightF').css("height", "auto");
-
+            deferred.resolve(content);
         });
-
-
-
-        content += '</tbody></table>'
+        return deferred.promise();
     }
 
     function loadPtaps() {
-        var city = localStorage.city
-        $.get("../../study_cases/ptapbycity/" + city, function(data) {
+        var city_id = localStorage.cityId
+        $.get("../../study_cases/ptapbycity/" + city_id, function(data) {
             if (data.length > 0) {
                 $.each(data, function(index, ptap) {
                     var name = ptap.plant_name;

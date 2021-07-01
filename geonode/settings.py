@@ -111,7 +111,10 @@ DATABASE_URL = os.getenv(
     )
 )
 
-#DATABASE_URL='postgresql://geonode:geonode@localhost:5432/geonode'
+#DATABASE_URL='postgresql://geonode:{&Uid&QXZ&6f;|F@dev.skaphe.com:5432/geonode'
+#DATABASE_URL='postgresql://geonode:{&Uid&QXZ&6f;|F@dev.skaphe.com:5432/geonode'
+#DATABASE_URL='postgresql://geonode:G30N0D3@water-proof.org:5432/geonode'
+
 
 if DATABASE_URL.startswith("spatialite"):
     try:
@@ -231,7 +234,12 @@ _DEFAULT_LANGUAGES = """(
 )"""
 
 
-LANGUAGES = ast.literal_eval(os.getenv('LANGUAGES', _DEFAULT_LANGUAGES))
+LANGUAGES =  ast.literal_eval(os.getenv('LANGUAGES', _DEFAULT_LANGUAGES))
+
+#LANGUAGES = (
+#    ('en', "English"),
+#    ('es', "Español"),
+#)
 
 EXTRA_LANG_INFO = {
     'am': {
@@ -1321,6 +1329,7 @@ except ValueError:
 
 # The proxy to use when making cross origin requests.
 PROXY_URL = os.environ.get('PROXY_URL', '/proxy/?url=')
+
 
 # Haystack Search Backend Configuration. To enable,
 # first install the following:

@@ -133,10 +133,10 @@ def createIntake(request):
             else:
                 errorMessage = _('Error saving intake')
                 context = {
-                    'status': '400', 'message': str(errorMessage)
+                    'status': '200', 'message': str(errorMessage)
                 }
                 response = HttpResponse(json.dumps(context), content_type='application/json')
-                response.status_code = 400
+                response.status_code = 200
                 return response
         else:
             print("Error step doesn't exits")
@@ -280,6 +280,7 @@ def createStepTwo(request):
             if (len(actualElements) > 0):
                 for element in actualElements:
                     print("deleting actualElements")
+                    print (element)
                     el = ElementSystem.objects.get(id=element)
                     existingValuesTime = list(ValuesTime.objects.filter(element=el.pk).values_list('id', flat=True))
                     for value in existingValuesTime:
@@ -317,7 +318,6 @@ def createStepTwo(request):
                                 if (len(costFunction) > 0):
                                     for function in costFunction:
                                         try:
-
                                             templateFunction = CostFunctionsProcess.objects.get(id=function['pk'])
                                             if ('currencyCost' in function['fields']):
                                                 currency = Countries.objects.get(id=function['fields']['currencyCost'])
@@ -333,20 +333,7 @@ def createStepTwo(request):
                                                 element_system = element_system,
                                                 intake = existingIntake,
                                             )
-                                            print(mainFunction)
-                                            # if ('logical' in function['fields']):
-                                            #     logicalFunctions = json.loads(function['fields']['logical'])
-                                            #     if (len(logicalFunctions) > 0):
-                                            #         for logical in logicalFunctions:
-                                            #             createdLogical = UserLogicalFunctions.objects.create(
-                                            #                 function1=logical['ecuation_1'],
-                                            #                 condition1=logical['condition_1'],
-                                            #                 function2=logical['ecuation_2'],
-                                            #                 condition2=logical['condition_2'],
-                                            #                 function3=logical['ecuation_3'],
-                                            #                 condition3=logical['condition_3'],
-                                            #                 mainFunction=mainFunction
-                                            #             )
+                                            print(mainFunction)                                            
                                         except Exception as e:
                                             print(e)
                         # External element
@@ -390,21 +377,7 @@ def createStepTwo(request):
                                                     element_system = element_system,
                                                     intake = existingIntake,
                                                 )
-
-                                            # if ('logical' in function['fields']):
-                                            #     logicalFunctions = json.loads(function['fields']['logical'])
-                                            #     if (len(logicalFunctions) > 0):
-                                            #         for logical in logicalFunctions:
-                                            #             createdLogical = UserLogicalFunctions.objects.create(
-                                            #                 function1=logical['ecuation_1'],
-                                            #                 condition1=logical['condition_1'],
-                                            #                 function2=logical['ecuation_2'],
-                                            #                 condition2=logical['condition_2'],
-                                            #                 function3=logical['ecuation_3'],
-                                            #                 condition3=logical['condition_3'],
-                                            #                 mainFunction=mainFunction
-                                            #             )
-
+                                           
                                     external_info = json.loads(element['externaldata'])
                                     elementCreated = ElementSystem.objects.get(graphId=element['id'], intake=intakeId)
                                     for external in external_info:
@@ -453,9 +426,9 @@ def createStepTwo(request):
                         elementsCreated.append(elementC)
                         if not (element['funcost'] == None):
                             costFunction = json.loads(element['funcost'])
-                            if (len(costFunction) > 0):
-                                
+                            if (len(costFunction) > 0):                                
                                 for function in costFunction:
+                                    # print (function)
                                     templateFunction = CostFunctionsProcess.objects.get(id=function['pk'])
                                     if ('currencyCost' in function['fields']):
                                         currency = Countries.objects.get(id=function['fields']['currencyCost'])
@@ -473,8 +446,8 @@ def createStepTwo(request):
                                     )
                                     if ('logical' in function['fields']):
                                         print("Saving logical function for connection")
-                                        logicalFunctions = json.loads(function['fields']['logical'])
-                                        print(len(logicalFunctions))
+                                        # logicalFunctions = json.loads(function['fields']['logical'])
+                                        # print(len(logicalFunctions))
                                         # if (len(logicalFunctions) > 0):
                                         #     for logical in logicalFunctions:
                                         #         print(logical)
@@ -745,11 +718,11 @@ def createStepFive(request):
             # Get intake original area
             for feature in intakeGeomJson['features']:
                 intakeGeom = GEOSGeometry(str(feature['geometry']))
+            
+            delimitation_type = 'SBN'
             if (intakeGeom.equals(delimitAreaGeom)):  # Delimit geom equal to intake geom
                 delimitation_type = 'CATCHMENT'
-            else:
-                delimitation_type = 'SBN'
-
+            
             existingPolygon = Polygon.objects.get(intake=existingIntake.pk)
             existingPolygon.geom = delimitAreaGeom
             existingPolygon. geomIntake = intakeAreaString
@@ -758,13 +731,14 @@ def createStepFive(request):
             existingPolygon.save()
             existingIntake.is_complete = True
             existingIntake.save()
+
+            print ("Current User ID: %s" % request.user.pk)
             argsInvest = {
                 'type': 'quality',
-                'id_usuario': 1,
+                'id_usuario': request.user.pk,
                 'basin': basinId,
-                'models': 'sdr',
-                'models': 'awy',
-                'models': 'ndr',
+                'models': ['sdr','awy','ndr'],                
+                'case': '-1', 
                 'catchment': existingIntake.pk,
             }
             argsWb = {
@@ -785,138 +759,143 @@ def createStepFive(request):
             }
             return response
 
-
 def listIntake(request):
-    #print("listIntake")
+
     if request.method == 'GET':
         city_id = request.GET['city']
-        if (city_id != ''):
-            intakes = Intake.objects.filter(city=city_id)            
-        else:
-            intakes = Intake.objects.all()
+        return intakes(request, city_id)
 
-        count = intakes.count()
-        # print ("total intakes: %s" % count)
-        if request.user.is_authenticated:            
-            userCountry = Countries.objects.get(iso3=request.user.country)
-            region = Regions.objects.get(id=userCountry.region_id)           
 
-            if (request.user.professional_role == 'ADMIN'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
+def intakes(request, city_id):
+    #print("intakes")
+    
+        
+    if (city_id != ''):
+        intakes = Intake.objects.filter(city=city_id)            
+    else:
+        intakes = Intake.objects.all()
 
-            if (request.user.professional_role == 'ANALYS'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
+    count = intakes.count()
+    # print ("total intakes: %s" % count)
+    if request.user.is_authenticated:            
+        userCountry = Countries.objects.get(iso3=request.user.country)
+        region = Regions.objects.get(id=userCountry.region_id)           
 
-            if (request.user.professional_role == 'COPART'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-
-            if (request.user.professional_role == 'ACDMC'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-
-            if (request.user.professional_role == 'SCADM'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-
-            if (request.user.professional_role == 'MCOMC'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-
-            if (request.user.professional_role == 'CITIZN'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-
-            if (request.user.professional_role == 'REPECS'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-
-            if (request.user.professional_role == 'OTHER'):
-                return render(
-                    request,
-                    'waterproof_intake/intake_list.html',
-                    {
-                        'intakeList': intakes,
-                        'userCountry': userCountry,
-                        'region': region
-                    }
-                )
-        else:
+        if (request.user.professional_role == 'ADMIN'):
             return render(
                 request,
                 'waterproof_intake/intake_list.html',
                 {
                     'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
                 }
             )
 
+        if (request.user.professional_role == 'ANALYS'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'COPART'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'ACDMC'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'SCADM'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'MCOMC'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'CITIZN'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'REPECS'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+
+        if (request.user.professional_role == 'OTHER'):
+            return render(
+                request,
+                'waterproof_intake/intake_list.html',
+                {
+                    'intakeList': intakes,
+                    'userCountry': userCountry,
+                    'region': region
+                }
+            )
+    else:
+        return render(
+            request,
+            'waterproof_intake/intake_list.html',
+            {
+                'intakeList': intakes,
+            }
+        )
+
 
 def editIntake(request, idx):
-    print("editIntake")
+    print("editIntake. request.method = %s" % request.method)
     if not request.user.is_authenticated:
         return render(request, 'waterproof_intake/intake_login_error.html')
     else:
+        filterIntake = Intake.objects.get(id=idx)
         if request.method == 'GET':
-            countries = Countries.objects.all()
-            filterIntake = Intake.objects.get(id=idx)
             filterExternal = ElementSystem.objects.filter(intake=filterIntake.pk, is_external=True)
             extInputs = []
 
@@ -940,22 +919,24 @@ def editIntake(request, idx):
                 # external['waterExtraction'] = extractionElements
                 extInputs.append(external)
             intakeExtInputs = json.dumps(extInputs)
-            city = Cities.objects.all()
-            form = forms.IntakeForm()
-            currencies = Countries.objects.all()
+            # city = Cities.objects.all()
+            # form = forms.IntakeForm()
+            currencies = Countries.objects.all().order_by('name')
             return render(
                 request, 'waterproof_intake/intake_edit.html',
                 {
                     'intake': filterIntake,
-                    'countries': countries,
-                    'city': city,
+                    'city': filterIntake.city,
                     'externalInputs': intakeExtInputs,
                     "serverApi": settings.WATERPROOF_API_SERVER,
                     'currencies': currencies,
                 }
-            )
-        response = redirect('/intake')
-        return response
+            )        
+            
+        print("redirect with parameters, city =  %s" % filterIntake.city.pk)
+        # response = redirect('/intake', city=filterIntake.city.pk)
+        # return response
+        return intakes(request, filterIntake.city.pk)
 
 
 def viewIntake(request, idx):
@@ -1022,10 +1003,10 @@ def cloneIntake(request, idx):
     if not request.user.is_authenticated:
         return render(request, 'waterproof_intake/intake_login_error.html')
     else:
+        filterIntake = Intake.objects.get(id=idx)
         if request.method == 'GET':
             currencies = Countries.objects.all()
-            countries = Countries.objects.all()
-            filterIntake = Intake.objects.get(id=idx)
+            countries = Countries.objects.all()            
             filterElementSystem = ElementSystem.objects.filter(intake=filterIntake.pk)
             filterPolygon = Polygon.objects.get(intake=filterIntake.pk)
             try:
@@ -1133,23 +1114,20 @@ def cloneIntake(request, idx):
                 # external['waterExtraction'] = extractionElements
                 extInputs.append(external)
             intakeExtInputs = json.dumps(extInputs)
-            city = Cities.objects.all()
             form = forms.IntakeForm()
-            currencies = Countries.objects.all()
             return render(
                 request, 'waterproof_intake/intake_clone.html',
                 {
-                    'currencies': Countries.objects.all(),
+                    'currencies': currencies,
                     'intake': newIntake,
                     'countries': countries,
-                    'city': city,
+                    'city': filterIntake.city,
                     'externalInputs': intakeExtInputs,
                     "serverApi": settings.WATERPROOF_API_SERVER
                 }
             )
-        response = redirect('/intake')
-        return response
-
+        else:
+            return intakes(request, filterIntake.city.pk)            
 
 def deleteIntake(request, idx):
     if request.method == "POST":
@@ -1192,7 +1170,11 @@ args:   Object
 
 
 def execInvest(request, args):
+    print("exectInvest ::")
+    
     url = settings.WATERPROOF_INVEST_API+'execInvest'
+    print("URL = %s" % url)
+    print(args)
     r = request.get(url, params=args)
     if r.status_code == 200:
         print("Resultado correcto Exec Invest:::")

@@ -17,6 +17,8 @@ var funcostdb = [];
 var bandera = true;
 var banderaValideGraph = 0;
 
+var costVars = ['WSedRet','WPRet','WNRet','WSed','WP','WN','CSed','CP','CN','Q'];
+
 // Program starts here. The document.onLoad executes the
 // createEditor function with a given configuration.
 // In the config file, the mxEditor.onInit method is
@@ -372,7 +374,9 @@ function onInit(editor) {
     $(document).ready(function() {
 
         var output = document.getElementById('MathPreview');
+        //console.log('MathPreview')
         var button = document.getElementById('btnValidatePyExp');
+        console.log("tipo de valor"+typeof(output))
 
         function typesetInput(expression) {
             button.disabled = true;
@@ -388,7 +392,7 @@ function onInit(editor) {
             });
         }
 
-        var CostSelected = null;      
+        var selectedCostId = null;      
 
         //KeyBoard calculator funcion cost
         $('button[name=mathKeyBoard]').click(function() {
@@ -450,17 +454,31 @@ function onInit(editor) {
                 );
                 selectedCell[0].setAttribute('varcost', JSON.stringify(varcost));
 
-                $.ajax({
-                    url: `/intake/loadProcess/${selectedCell[0].dbreference}`,
-                    success: function(result) {
-                        selectedCell[0].setAttribute("resultdb", result);
-                    }
-                });
+                if (selectedCell[0].dbreference != undefined){
+                    $.ajax({
+                        url: `/intake/loadProcess/${selectedCell[0].dbreference}`,
+                        success: function(result) {
+                            selectedCell[0].setAttribute("resultdb", result);
+                        }
+                    });
+                }                
 
                 $.ajax({
                     url: `/intake/loadFunctionBySymbol/${selectedCell[0].funcionreference}`,
                     success: function(result) {
-                        selectedCell[0].setAttribute("funcost", result);
+                        var id = selectedCell[0].id;
+                        
+                        var jsonResult = JSON.parse(result);
+                        jsonResult.forEach(r =>{
+                            var function_value = r.fields.function_value;
+                            costVars.forEach(v =>{
+                                let regex = new RegExp(v + '\\b', 'g');
+                                function_value = function_value.replaceAll(regex, v + id);                                
+                            })
+                            r.fields.function_value = function_value;
+                        })
+                        
+                        selectedCell[0].setAttribute("funcost", JSON.stringify(jsonResult));
                     }
                 });
             }
@@ -574,14 +592,15 @@ function onInit(editor) {
                         'function_name': $('#costFunctionName').val() == '' ? 'Undefined name' : $('#costFunctionName').val(),
                         'function_description': $('#costFuntionDescription').val(),
                         'global_multiplier_factorCalculator': $('#global_multiplier_factorCalculator').val(),
-                        'currencyCost': $('#currencyCost').val(),
+                        'currencyCost': $('#currencyCost option:selected').val(),
+                        'currencyCostName': $('#currencyCost option:selected').text(),
                         'logical': [{
-                            'condition_1': "", /* mathFieldlog1.latex(), */
-                            'ecuation_1': "", /* mathFieldE1.latex(), */
-                            'condition_2': "", /* mathFieldlog2.latex(), */
-                            'ecuation_2': "", /* mathFieldE2.latex(), */
-                            'condition_3': "", /* mathFieldlog3.latex(), */
-                            'ecuation_3': "", /* mathFieldE3.latex() */
+                            'condition_1': "",
+                             'ecuation_1': "",
+                             'condition_2': "",
+                             'ecuation_2': "",
+                             'condition_3': "",
+                             'ecuation_3': ""
                         }],
                     }
                 });
@@ -590,31 +609,47 @@ function onInit(editor) {
             } else {
                 //false = editar
                 var temp = {
+                    'function_value': $('#python-expression').val(),
                     'function_name': $('#costFunctionName').val() == '' ? 'Undefined name' : $('#costFunctionName').val(),
-                    'function_description': $('#costFuntionDescription').val(),
+                    'function_description': $('#costFuntionDescription').val(),                    
                     'global_multiplier_factorCalculator': $('#global_multiplier_factorCalculator').val(),
-                    'currencyCost': $('#currencyCost').val(),
+                    'currencyCost': $('#currencyCost option:selected').val(),
+                    'currencyCostName': $('#currencyCost option:selected').text(),
                     'logical': [{
-                        'condition_1': "", /* mathFieldlog1.latex(), */
-                        'ecuation_1': "", /* mathFieldE1.latex(), */
-                        'condition_2': "", /* mathFieldlog2.latex(), */
-                        'ecuation_2': "", /* mathFieldE2.latex(), */
-                        'condition_3': "", /* mathFieldlog3.latex(), */
-                        'ecuation_3': "", /* mathFieldE3.latex() */
+                        'condition_1': "", 
+                        'ecuation_1': "", 
+                        'condition_2': "", 
+                        'ecuation_2': "", 
+                        'condition_3': "", 
+                        'ecuation_3': "", 
                     }],
                 }
 
                 temp.logical = JSON.stringify(temp.logical);
-                $.extend(funcostdb[CostSelected].fields, temp);
+                if (selectedCostId == 0){
+                    $.extend(funcostdb[selectedCostId].fields, temp);
+                }else{
+                    let clonedFunCost = JSON.parse(JSON.stringify(funcostdb[0]));
+                    $.extend(clonedFunCost.fields, temp);
+                    funcostdb[selectedCostId] = clonedFunCost;
+                }
+                
                 var pyExp = $('#python-expression').val();
-                funcostdb[CostSelected].fields.function_value = pyExp; 
+                funcostdb[selectedCostId].fields.function_value = pyExp; 
             }
-            selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
-            $('#funcostgenerate div').remove();
+            if (typeof(selectedCell.value) == "object"){
+                selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
+            }else{
+                var valueSelectedCell = JSON.parse(selectedCell.value);
+                valueSelectedCell.funcost = funcostdb;
+                selectedCell.value = JSON.stringify(valueSelectedCell);
+            }
+            
+            $('#funcostgenerate tr').remove();
             $('#funcostgenerate').empty();
             for (let index = 0; index < funcostdb.length; index++) {
                 // funcostdb[index].fields.function_value, funcostdb[index].fields.function_name,
-                funcost( index, MQ);
+                funcost( index);
             }
             $('#CalculatorModal').modal('hide');
             validateGraphIntake();
@@ -625,13 +660,19 @@ function onInit(editor) {
             //mathField.clearSelection();
             clearInputsMath();
             $('#CalculatorModal').modal('show');
-            CostSelected = $(this).attr('idvalue');
-            $('#costFunctionName').val(funcostdb[CostSelected].fields.function_name);
-            $('#costFuntionDescription').val(funcostdb[CostSelected].fields.function_description);
+            selectedCostId =  parseInt($(this).attr('idvalue'));
+            $('#costFunctionName').val(funcostdb[selectedCostId].fields.function_name);
+            $('#costFuntionDescription').val(funcostdb[selectedCostId].fields.function_description);
             $('#CalculatorModalLabel').text('Modify Cost - ' + $('#titleCostFunSmall').text())
             setVarCost();
-            let value = funcostdb[CostSelected].fields.function_value;
-            $('#python-expression').val(value);
+            let value = funcostdb[selectedCostId].fields.function_value;
+            console.log("valor de value es: "+value+typeof(value))
+            if (value == ""){
+                $('#python-expression').val();
+            }
+            else{
+                $('#python-expression').val(value);
+            }
             validatePyExpression();            
         });
 
@@ -648,14 +689,14 @@ function onInit(editor) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     var id = $(this).attr('idvalue');
-                    $(`#funcostgenerate div[idvalue = 'fun_${id}']`).remove();
+                    $(`#funcostgenerate tr[idvalue = 'fun_${id}']`).remove();
                     if (typeof(selectedCell.value) == "string" && selectedCell.value.length > 0) {
                         var obj = JSON.parse(selectedCell.value);
                         let dbfields = JSON.parse(obj.funcost);
                         dbfields.splice(id, 1);
                         obj.funcost = JSON.stringify(dbfields);
                         selectedCell.setValue(JSON.stringify(obj));
-                        $('#funcostgenerate div').remove();
+                        $('#funcostgenerate tr').remove();
                         $('#funcostgenerate').empty();
                         for (let index = 0; index < funcostdb.length; index++) {
                             funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
@@ -663,7 +704,7 @@ function onInit(editor) {
                     } else {
                         funcostdb.splice(id, 1);
                         selectedCell.setAttribute('funcost', JSON.stringify(funcostdb));
-                        $('#funcostgenerate div').remove();
+                        $('#funcostgenerate tr').remove();
                         $('#funcostgenerate').empty();
                         for (let index = 0; index < funcostdb.length; index++) {
                             funcost(funcostdb[index].fields.function_value, funcostdb[index].fields.function_name, index, MQ);
@@ -676,6 +717,11 @@ function onInit(editor) {
                     );
                 }
             })
+        });
+
+        $(document).on('click', 'a[name=fun_display_btn]', function() {
+            var idx = $(this).attr('idvalue');
+            $(`#fun_display_${idx}`).toggle();
         });
 
         function setVarCost() {
@@ -704,7 +750,9 @@ function onInit(editor) {
             banderaFunctionCost = true;
             $('#VarCostListGroup div').remove();
             $('#VarCostListGroup').empty();
+            console.log("este es agregar")
             clearInputsMath();
+            typesetInput('');
             $('#costFunctionName').val('');
             $('#costFuntionDescription').val('');
             $('#CalculatorModalLabel').text('New Function Cost - ' + $('#titleCostFunSmall').text())
@@ -726,6 +774,9 @@ function onInit(editor) {
                 </div>
                 `);
             }
+            $('#python-expression').val('');
+            //$('#MathPreview').val('');
+            validatePyExpression();
         });
 
         //Add value entered in sediments in the field resultdb
