@@ -162,7 +162,9 @@ services:
   wfapp_py3:
     image: wfapp_py3
     container_name: wfapp_py3_container
-    build: ../../ModelosWFAPP/
+    build:
+      context: ../../ModelosWFAPP/
+      dockerfile: Dockerfile    
     environment:
       - PG_HOST=${PG_HOST}
       - PG_GEO_DATABASE=${PG_GEO_DATABASE}
@@ -175,14 +177,44 @@ services:
       - PATH_FILES=${PATH_FILES}
       - GDAL_DATA=/usr/share/gdal
     volumes:
-      - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
-      # - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      # - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/    
+      # - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      # - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/    
+      - C:/ws/SKP/geonode/ModelosWFAPP:/app
     ports:
-      - 8000:8000
+      - 8001:8001
       - 3000:3000
-    restart: on-failure
+    #restart: on-failure
+
+  wfapp_py2:
+    image: wfapp_py2
+    container_name: wfapp_py2_container
+    build:
+      context: ../../ModelosRIOS/
+      dockerfile: Dockerfile   
+    #restart: on-failure
+    environment:
+      - PG_HOST=${PG_HOST}
+      - PG_GEO_DATABASE=${PG_GEO_DATABASE}
+      - PG_GEO_USER=${PG_GEO_USER}
+      - PG_GEO_PASSWORD=${PG_GEO_PASSWORD}
+      - PG_DATABASE=${PG_DATABASE}
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_PORT=${PG_PORT}
+      - PATH_FILES=${PATH_FILES}      
+    volumes:
+      # - /data/global_datasets/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      # - /data/outputs/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      # - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      # - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      - C:/ws/SKP/geonode/ModelosRIOS:/app
+    ports:
+      - 5050:5050
+      - 5678:5678
 
 volumes:
   static:
@@ -192,4 +224,4 @@ volumes:
   certificates:
   pgdumps:
   rabbitmq:
-
+      
