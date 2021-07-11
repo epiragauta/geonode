@@ -52,6 +52,8 @@ services:
       - static:/spcwaterproof-static/
       - media:/spcwaterproof-media/
       - certificates:/spcwaterproof-certificates/
+      - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
     restart: on-failure
 
   # Geoserver backend
