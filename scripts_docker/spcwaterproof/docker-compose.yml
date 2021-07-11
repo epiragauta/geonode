@@ -52,8 +52,8 @@ services:
       - static:/spcwaterproof-static/
       - media:/spcwaterproof-media/
       - certificates:/spcwaterproof-certificates/
-      - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      - inputs/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      - outputs/:/home/skaphe/Documentos/tnc/modelos/salidas/
     restart: on-failure
 
   # Geoserver backend
@@ -179,10 +179,10 @@ services:
       - PATH_FILES=${PATH_FILES}
       - GDAL_DATA=/usr/share/gdal
     volumes:
-      # - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      # - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
-      - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/    
+      - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      # - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      #- F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/    
       # - C:/ws/SKP/geonode/ModelosWFAPP:/app
     ports:
       - 8001:8001
@@ -209,11 +209,11 @@ services:
     volumes:
       # - /data/global_datasets/:/home/skaphe/Documentos/tnc/modelos/entradas/
       # - /data/outputs/:/home/skaphe/Documentos/tnc/modelos/salidas/
-      # - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      # - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
-      - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
-      - C:/ws/SKP/geonode/ModelosRIOS:/app
+      - /home/skaphe/Documentos/tnc/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      # - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
+      # - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      # - C:/ws/SKP/geonode/ModelosRIOS:/app
     ports:
       - 5050:5050
       - 5678:5678
@@ -226,4 +226,6 @@ volumes:
   certificates:
   pgdumps:
   rabbitmq:
+  inputs:
+  outputs:
       
