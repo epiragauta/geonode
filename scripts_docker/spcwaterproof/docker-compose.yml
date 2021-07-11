@@ -183,7 +183,7 @@ services:
       # - /home/skaphe/Documentos/tnc/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/
       - F:/PROYECTOS/TNC/WFAPP/modelos/entradas/:/home/skaphe/Documentos/tnc/modelos/entradas/
       - F:/PROYECTOS/TNC/WFAPP/modelos/salidas/:/home/skaphe/Documentos/tnc/modelos/salidas/    
-      - C:/ws/SKP/geonode/ModelosWFAPP:/app
+      # - C:/ws/SKP/geonode/ModelosWFAPP:/app
     ports:
       - 8001:8001
       - 3000:3000
