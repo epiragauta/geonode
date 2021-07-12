@@ -51,9 +51,7 @@ services:
     volumes:
       - static:/spcwaterproof-static/
       - media:/spcwaterproof-media/
-      - certificates:/spcwaterproof-certificates/
-      - inputs/:/home/skaphe/Documentos/tnc/modelos/entradas/
-      - outputs/:/home/skaphe/Documentos/tnc/modelos/salidas/
+      - certificates:/spcwaterproof-certificates/     
     restart: on-failure
 
   # Geoserver backend
@@ -226,6 +224,4 @@ volumes:
   certificates:
   pgdumps:
   rabbitmq:
-  inputs:
-  outputs:
       
